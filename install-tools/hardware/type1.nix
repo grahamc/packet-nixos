@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 {
   boot = {
+    supportedFilesystems = [ "zfs" ];
     initrd = {
       availableKernelModules = [
         "xhci_pci" "ehci_pci" "ahci" "usbhid" "sd_mod"
@@ -11,15 +12,18 @@
     extraModulePackages = [ ];
     loader = {
       grub = {
+        zfsSupport = true;
         devices = [ "/dev/sda" "/dev/sdb" ];
       };
     };
   };
 
+  services.zfs.autoScrub.enable = true;
+
   fileSystems = {
     "/" = {
-      device = "/dev/disk/by-label/nixos";
-      fsType = "ext4";
+      device = "rpool/root/nixos";
+      fsType = "zfs";
     };
   };
 

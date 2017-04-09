@@ -2,7 +2,7 @@
 
 set -eux
 
-PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@mdadm@/bin:$PATH
+PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@mdadm@/bin:@zfs@/bin:/run/current-system/sw/bin/:$PATH
 
 partition() {
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF
@@ -21,25 +21,28 @@ EOF
 
 }
 
-if [ ! -b /dev/md0 ]; then
-    partition | fdisk /dev/sda
-    partition | fdisk /dev/sdb
+udevadm settle
+partition | fdisk /dev/sda
+partition | fdisk /dev/sdb
+udevadm settle
 
-    mdadm --create --verbose /dev/md0 --level=mirror \
-          --raid-devices=2 /dev/sda1 /dev/sdb1 --metadata=0.90
-fi
+zpool create -o ashift=12 rpool raidz /dev/sda1 /dev/sdb1
 
-mkfs.ext4 -L nixos /dev/md0 < /dev/null
-sleep 5
-mount /dev/disk/by-label/nixos /mnt
+# since all the disks are the same, I'm skipping the SLOG and L2ARC
+zfs create -o mountpoint=none rpool/root
+zfs create -o compression=lz4 -o mountpoint=legacy rpool/root/nixos
+udevadm settle
+mount -t zfs rpool/root/nixos /mnt
 
 nixos-generate-config --root /mnt
 
+hostId=$(printf "%x" $(cksum /etc/machine-id | cut -d' ' -f1))
+echo '{ networking.hostId = "'$hostId'"; }' > /mnt/etc/nixos/host-id.nix
 packet-config-gen > /mnt/etc/nixos/packet.nix
 cat @standardconf@ > /mnt/etc/nixos/standard.nix
 cat @type1conf@ > /mnt/etc/nixos/hardware-configuration.nix
 
-sed -i "s#./hardware-configuration.nix#./hardware-configuration.nix ./standard.nix ./packet.nix#" /mnt/etc/nixos/configuration.nix
+sed -i "s#./hardware-configuration.nix#./hardware-configuration.nix ./standard.nix ./host-id.nix ./packet.nix#" /mnt/etc/nixos/configuration.nix
 
 nixos-install < /dev/null
 

@@ -2,8 +2,9 @@
 
 set -eux
 
-PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:$PATH
+PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:/run/current-system/sw/bin/:$PATH
 
+udevadm settle
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/sda
       o # clear the in memory partition table
       n # new partition
@@ -18,10 +19,11 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/sda
       q # and we're done
 EOF
 
+udevadm settle
 mkfs.ext4 -L nixos /dev/sda1
-sleep 5
+udevadm settle
 mount /dev/disk/by-label/nixos /mnt
-
+udevadm settle
 nixos-generate-config --root /mnt
 
 packet-config-gen > /mnt/etc/nixos/packet.nix

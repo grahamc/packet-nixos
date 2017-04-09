@@ -1,7 +1,7 @@
 #!/bin/sh
 
 (
-    while ! $1; do
+    while ! $1 < /dev/null; do
         echo "Failed..."
         umount /mnt
         sleep 1

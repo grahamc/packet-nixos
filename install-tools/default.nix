@@ -20,7 +20,7 @@ in pkgs.stdenv.mkDerivation {
   name = "installtools";
   src = ./bin;
 
-  inherit (pkgs) coreutils utillinux e2fsprogs mdadm;
+  inherit (pkgs) coreutils utillinux e2fsprogs mdadm zfs;
   inherit packetconfiggen python3;
   standardconf = ./hardware/standard.nix;
   type0conf = ./hardware/type0.nix;

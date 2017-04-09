@@ -2,7 +2,7 @@
 
 set -eux
 
-PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@mdadm@/bin:$PATH
+PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@mdadm@/bin:@zfs@/bin:/run/current-system/sw/bin/:$PATH
 
 partition() {
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF
@@ -16,32 +16,31 @@ partition() {
           t # Change type
           bf # zfs
           p # print the in-memory partition table
-          w # write the partition table
+          w # write the partition tableni
 EOF
 
 }
 
-if [ ! -b /dev/md0 ]; then
-    partition | fdisk /dev/sda
-    partition | fdisk /dev/sdb
-    partition | fdisk /dev/sdc
-    partition | fdisk /dev/sdd
-    partition | fdisk /dev/sde
-    partition | fdisk /dev/sdf
-
-fi
-
+udevadm settle
+partition | fdisk /dev/sda
+partition | fdisk /dev/sdb
+partition | fdisk /dev/sdc
+partition | fdisk /dev/sdd
+partition | fdisk /dev/sde
+partition | fdisk /dev/sdf
+udevadm settle
 
 zpool create -o ashift=12 rpool raidz2 /dev/sda1 /dev/sdb1 /dev/sdc1 /dev/sdd1 /dev/sde1 /dev/sdf1
 
 # since all the disks are the same, I'm skipping the SLOG and L2ARC
 zfs create -o mountpoint=none rpool/root
 zfs create -o compression=lz4 -o mountpoint=legacy rpool/root/nixos
+udevadm settle
 mount -t zfs rpool/root/nixos /mnt
 
 nixos-generate-config --root /mnt
 
-hostId=$(cksum /etc/machine-id | while read c rest; do printf "%x" $c; done)
+hostId=$(printf "%x" $(cksum /etc/machine-id | cut -d' ' -f1))
 echo '{ networking.hostId = "'$hostId'"; }' > /mnt/etc/nixos/host-id.nix
 packet-config-gen > /mnt/etc/nixos/packet.nix
 cat @standardconf@ > /mnt/etc/nixos/standard.nix

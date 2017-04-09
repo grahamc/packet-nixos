@@ -5,7 +5,13 @@ import json
 import requests
 import os
 
-d = requests.get('https://metadata.packet.net/metadata').json()
+while True:
+    try:
+        d = requests.get('https://metadata.packet.net/metadata').json()
+        break
+    except:
+        pass
+
 plan = d['plan']
 
 scripts = {
