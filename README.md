@@ -24,4 +24,4 @@ $ ./pxe.sh gsc.io:sites/gsc.io/public/nixos-packet-ipxe
 Then use `http://gsc.io/nixos-packet-ipxe/netboot.ipxe` when booting
 your Packet.net server.
 
-Also, you could just use http://gsc.io/lol-t2/netboot.ipxe
+Also, you could just use http://gsc.io/nixos-packet-ipxe/netboot.ipxe
