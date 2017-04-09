@@ -32,9 +32,4 @@ in {
       HOME = "/root";
     };
   };
-
-  #system.activationScripts.do-install = ''
-  #  echo "echo ${install-tools}/bin/dispatch.py" >> /root/.profile
-  #  echo "echo 'tail -f ./installer.log'" >> /root/.profile
-  #'';
 }
