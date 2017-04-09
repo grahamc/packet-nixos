@@ -16,7 +16,7 @@ in {
     wantedBy = [ "multi-user.target" ];
     after = [ "multi-user.target" ];
     script = ''
-      mkdir /root/.ssh
+      mkdir /root/.ssh || true
       touch /root/.ssh/authorized_keys
       chmod 0644 /root/.ssh/authorized_keys
       ${install-tools}/bin/dump-keys.py > /root/.ssh/authorized_keys

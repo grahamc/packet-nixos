@@ -1,5 +1,12 @@
 #!/bin/sh
 
+if [ "x$1" = "x" ]; then
+    echo "$0 <rsync-target>"
+    echo "ex: gsc.io:sites/gsc.io/public/nixos-packet-ipxe"
+    exit 1
+fi
+
+set -eu
 
 NIX_REMOTE=daemon nix-build \
     '<nixpkgs/nixos>' \
@@ -10,4 +17,4 @@ NIX_REMOTE=daemon nix-build \
     -Q -j 4
 
 rsync --progress --ignore-times ./result-3/netboot.ipxe ./result-2/bzImage ./result/initrd \
-    gchristensen@gsc.io:sites/gsc.io/public/lol-t2/
+      "$1"
