@@ -7,7 +7,6 @@ let
 in {
   imports = [ <nixpkgs/nixos/modules/installer/netboot/netboot-minimal.nix> ];
   boot.supportedFilesystems = [ "zfs" ];
-  boot.kernelParams = [ "console=ttyS1,115200n8" ];
   networking.hostName = "ipxe";
 
   systemd.services.sshd.wantedBy = mkForce [ "multi-user.target" ];
