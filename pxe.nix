@@ -11,7 +11,17 @@ in {
   networking.hostName = "ipxe";
 
   systemd.services.sshd.wantedBy = mkForce [ "multi-user.target" ];
-  users.users.root.openssh.authorizedKeys.keys = [ "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDTZB6tOYfEmWkYff494DjPpzo45ymhTvEPT4rjPyeTfBB1p+odbaVnYFQPgwk4MYBZyPjzQa9NLC76m2kCDNqnasBFGhTLxSfR9q/4J5G9x0a5NvA/emqNpjtbT25UADjhEETOIYjLYdd7z9rGFr/8ttmJNog6t9NIEw7/ddupzpvNaK80rdPSO7jt4/3TxFiix3yvaTNe4XahCiEDNIXF0hskOTuFtUX4LgiET9lmJa92i/Oh/7oYxDBond6C95HyoppGJu6y3txutAWt12N5rLRzWSPECwrJRNcXIqmIjofl+pt4vd7D4DHCxesKajG4fAs+KXZ3Lxug2dZB0eD grahamc@nixos" ];
+
+  systemd.services.dumpkeys = {
+    wantedBy = [ "multi-user.target" ];
+    after = [ "multi-user.target" ];
+    script = ''
+      mkdir /root/.ssh
+      touch /root/.ssh/authorized_keys
+      chmod 0644 /root/.ssh/authorized_keys
+      ${install-tools}/bin/dump-keys.py > /root/.ssh/authorized_keys
+    '';
+  };
 
   systemd.services.doinstall = {
     wantedBy = [ "multi-user.target" ];

@@ -1,8 +1,25 @@
 { pkgs ? import <nixpkgs> {}}:
 let
   python3 = (pkgs.python3.withPackages (ps: [ps.requests2]));
+
   packetconfiggen = pkgs.stdenv.mkDerivation rec {
     name = "packetconfiggen";
+    src = ./metadata2hardware.py;
+
+    python = python3;
+
+    phases = [ "installPhase" ];
+
+    installPhase = ''
+      mkdir -p $out/bin
+      echo "#!${python}/bin/python3" > $out/bin/packet-config-gen
+      cat $src >> $out/bin/packet-config-gen
+      chmod +x $out/bin/packet-config-gen
+    '';
+  };
+
+  dumpkeys = pkgs.stdenv.mkDerivation rec {
+    name = "dumpkeys";
     src = ./metadata2hardware.py;
 
     python = python3;
@@ -29,6 +46,7 @@ in pkgs.stdenv.mkDerivation {
 
   buildPhase = ''
     substituteAllInPlace ./dispatch.py
+    substituteAllInPlace ./dump-keys.py
     substituteAllInPlace ./type0.sh
     substituteAllInPlace ./type1.sh
     substituteAllInPlace ./type2.sh

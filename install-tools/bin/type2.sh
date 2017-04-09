@@ -40,7 +40,7 @@ mount -t zfs rpool/root/nixos /mnt
 
 nixos-generate-config --root /mnt
 
-hostId=$(printf "%x" $(cksum /etc/machine-id | cut -d' ' -f1))
+hostId=$(printf "00000000%x" $(cksum /etc/machine-id | cut -d' ' -f1) | tail -c8)
 echo '{ networking.hostId = "'$hostId'"; }' > /mnt/etc/nixos/host-id.nix
 packet-config-gen > /mnt/etc/nixos/packet.nix
 cat @standardconf@ > /mnt/etc/nixos/standard.nix
