@@ -43,6 +43,7 @@ in pkgs.stdenv.mkDerivation {
   type0conf = ./hardware/type0.nix;
   type1conf = ./hardware/type1.nix;
   type2conf = ./hardware/type2.nix;
+  type2aconf = ./hardware/type2a.nix;
 
   buildPhase = ''
     substituteAllInPlace ./dispatch.py
@@ -50,6 +51,7 @@ in pkgs.stdenv.mkDerivation {
     substituteAllInPlace ./type0.sh
     substituteAllInPlace ./type1.sh
     substituteAllInPlace ./type2.sh
+    substituteAllInPlace ./type2a.sh
   '';
 
   installPhase = ''

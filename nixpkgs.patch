@@ -1,0 +1,71 @@
+diff --git a/nixos/modules/installer/netboot/netboot.nix b/nixos/modules/installer/netboot/netboot.nix
+index 0f6046339b3..6c895102794 100644
+--- a/nixos/modules/installer/netboot/netboot.nix
++++ b/nixos/modules/installer/netboot/netboot.nix
+@@ -20,15 +20,15 @@ with lib;
+ 
+   config = {
+ 
+-    boot.loader.grub.version = 2;
++    # boot.loader.grub.version = 2;
+ 
+     # Don't build the GRUB menu builder script, since we don't need it
+     # here and it causes a cyclic dependency.
+     boot.loader.grub.enable = false;
+ 
+     # !!! Hack - attributes expected by other modules.
+-    system.boot.loader.kernelFile = "bzImage";
+-    environment.systemPackages = [ pkgs.grub2 pkgs.grub2_efi pkgs.syslinux ];
++    system.boot.loader.kernelFile = "Image";
++    # environment.systemPackages = [ pkgs.grub2 pkgs.grub2_efi ];
+ 
+     fileSystems."/" =
+       { fsType = "tmpfs";
+@@ -84,7 +84,7 @@ with lib;
+         ];
+     };
+ 
+-    system.build.netbootIpxeScript = pkgs.writeTextDir "netboot.ipxe" "#!ipxe\nkernel bzImage init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams}\ninitrd initrd\nboot";
++    system.build.netbootIpxeScript = pkgs.writeTextDir "netboot.ipxe" "#!ipxe\nkernel Image init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams}\ninitrd initrd\nboot";
+ 
+     boot.loader.timeout = 10;
+ 
+diff --git a/pkgs/os-specific/linux/kernel/manual-config.nix b/pkgs/os-specific/linux/kernel/manual-config.nix
+index 55162e54f4d..8a6c3f5fcbf 100644
+--- a/pkgs/os-specific/linux/kernel/manual-config.nix
++++ b/pkgs/os-specific/linux/kernel/manual-config.nix
+@@ -162,18 +162,15 @@ let
+         chmod u+w -R ../source
+         arch=`cd $dev/lib/modules/${modDirVersion}/build/arch; ls`
+ 
+-        # Remove unusued arches
+-        mv arch/$arch .
+-        rm -fR arch
+-        mkdir arch
+-        mv $arch arch
+-
+         # Remove all driver-specific code (50M of which is headers)
+         rm -fR drivers
+ 
+         # Keep all headers
+         find .  -type f -name '*.h' -print0 | xargs -0 chmod u-w
+ 
++        # Keep all lds files for Aarch64
++        find .  -type f -name '*.lds' -print0 | xargs -0 chmod u-w
++
+         # Keep root and arch-specific Makefiles
+         chmod u-w Makefile
+         chmod u-w arch/$arch/Makefile*
+diff --git a/pkgs/os-specific/linux/syslinux/default.nix b/pkgs/os-specific/linux/syslinux/default.nix
+index ce63d383c8e..70c3cb5792a 100644
+--- a/pkgs/os-specific/linux/syslinux/default.nix
++++ b/pkgs/os-specific/linux/syslinux/default.nix
+@@ -43,7 +43,7 @@ stdenv.mkDerivation rec {
+     "DATADIR=$(out)/share"
+     "MANDIR=$(out)/share/man"
+     "PERL=perl"
+-    "bios"
++    "efi64"
+   ];
+ 
+   postInstall = ''
