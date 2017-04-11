@@ -49,6 +49,7 @@ in pkgs.stdenv.mkDerivation {
     substituteAllInPlace ./dispatch.py
     substituteAllInPlace ./notify.py
     substituteAllInPlace ./dump-keys.py
+    substituteAllInPlace ./tools.sh
     substituteAllInPlace ./type0.sh
     substituteAllInPlace ./type1.sh
     substituteAllInPlace ./type2.sh

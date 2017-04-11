@@ -2,9 +2,10 @@
 
 set -eux
 
-PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@out@/bin:/run/current-system/sw/bin/:$PATH
+. @out@/bin/tools.sh
 
-udevadm settle
+pre_partition
+
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/sda
       o # clear the in memory partition table
       n # new partition
@@ -24,21 +25,20 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/sda
       w # write the partition table
 EOF
 
-udevadm settle
+pre_format
+
 mkfs.vfat /dev/sda1
 mkfs.ext4 -L nixos /dev/sda2
-udevadm settle
+
+pre_mount
+
 mount /dev/disk/by-label/nixos /mnt
 mkdir -p /mnt/boot/efi
 mount /dev/sda1 /mnt/boot/efi
-udevadm settle
 
-notify.py partitioned
+post_mount
 
-nixos-generate-config --root /mnt
-
-packet-config-gen > /mnt/etc/nixos/packet.nix
-cat @standardconf@ > /mnt/etc/nixos/standard.nix
+generate_standard_config
 cat @type2aconf@ > /mnt/etc/nixos/hardware-configuration.nix
 
 sed -i "s#./hardware-configuration.nix#./hardware-configuration.nix ./standard.nix ./packet.nix#" /mnt/etc/nixos/configuration.nix
