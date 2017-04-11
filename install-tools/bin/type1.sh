@@ -49,5 +49,5 @@ sed -i "s#./hardware-configuration.nix#./hardware-configuration.nix ./standard.n
 nixos-install < /dev/null
 
 notify.py installed
-
+touch /mnt/etc/.packet-phone-home
 reboot
