@@ -24,8 +24,39 @@ post_mount() {
 generate_standard_config() {
     nixos-generate-config --root /mnt
 
-    packet-config-gen > /mnt/etc/nixos/packet.nix
-    cat @standardconf@ > /mnt/etc/nixos/standard.nix
+    mkdir -p /mnt/etc/nixos/packet
+    packet-config-gen > /mnt/etc/nixos/packet/metadata.nix
+    cat @standardconf@ > /mnt/etc/nixos/packet/standard.nix
+
+    # for ZFS
+    hostId=$(printf "00000000%x" $(cksum /etc/machine-id | cut -d' ' -f1) | tail -c8)
+    echo '{ networking.hostId = "'$hostId'"; }' > /mnt/etc/nixos/packet/host-id.nix
+
+    update_includes_nix
+    sed -i "s#./hardware-configuration.nix#./hardware-configuration.nix ./packet.nix#" /mnt/etc/nixos/configuration.nix
+
+    place_phone_home
+    update_includes_nix
+}
+
+place_phone_home() {
+    cat @phonehomeconf@ > /mnt/etc/nixos/packet/phone-home.nix
+    update_includes_nix
+}
+
+delete_phone_home() {
+    rm /mnt/etc/nixos/packet/phone-home.nix
+    update_includes_nix
+}
+
+update_includes_nix() {
+    pushd /mnt/etc/nixos/
+    (
+        echo "{ imports = [";
+        find ./packet/ -type f
+        echo "]; }"
+    ) > packet.nix
+    popd
 }
 
 do_install() {
@@ -34,6 +65,7 @@ do_install() {
 
     notify.py installed
     touch /mnt/etc/.packet-phone-home
+    delete_phone_home
 }
 
 do_reboot() {

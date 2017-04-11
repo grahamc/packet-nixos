@@ -44,11 +44,7 @@ post_mount
 
 generate_standard_config
 
-hostId=$(printf "00000000%x" $(cksum /etc/machine-id | cut -d' ' -f1) | tail -c8)
-echo '{ networking.hostId = "'$hostId'"; }' > /mnt/etc/nixos/host-id.nix
 cat @type2conf@ > /mnt/etc/nixos/hardware-configuration.nix
-
-sed -i "s#./hardware-configuration.nix#./hardware-configuration.nix ./standard.nix ./host-id.nix ./packet.nix#" /mnt/etc/nixos/configuration.nix
 
 do_install
 do_reboot

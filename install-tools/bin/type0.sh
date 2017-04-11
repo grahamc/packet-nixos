@@ -32,7 +32,5 @@ generate_standard_config
 
 cat @type0conf@ > /mnt/etc/nixos/hardware-configuration.nix
 
-sed -i "s#./hardware-configuration.nix#./hardware-configuration.nix ./standard.nix ./packet.nix#" /mnt/etc/nixos/configuration.nix
-
 do_install
 do_reboot
