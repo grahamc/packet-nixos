@@ -2,7 +2,7 @@
 
 set -eux
 
-PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@mdadm@/bin:@zfs@/bin:/run/current-system/sw/bin/:$PATH
+PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@mdadm@/bin:@zfs@/bin:@out@/bin:/run/current-system/sw/bin/:$PATH
 
 partition() {
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF
@@ -36,6 +36,9 @@ zpool create -o ashift=12 rpool raidz2 /dev/sda1 /dev/sdb1 /dev/sdc1 /dev/sdd1 /
 zfs create -o mountpoint=none rpool/root
 zfs create -o compression=lz4 -o mountpoint=legacy rpool/root/nixos
 udevadm settle
+
+notify.py partitioned
+
 mount -t zfs rpool/root/nixos /mnt
 
 nixos-generate-config --root /mnt
@@ -49,5 +52,7 @@ cat @type2conf@ > /mnt/etc/nixos/hardware-configuration.nix
 sed -i "s#./hardware-configuration.nix#./hardware-configuration.nix ./standard.nix ./host-id.nix ./packet.nix#" /mnt/etc/nixos/configuration.nix
 
 nixos-install < /dev/null
+
+notify.py installed
 
 reboot

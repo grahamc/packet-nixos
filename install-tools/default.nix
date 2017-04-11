@@ -47,6 +47,7 @@ in pkgs.stdenv.mkDerivation {
 
   buildPhase = ''
     substituteAllInPlace ./dispatch.py
+    substituteAllInPlace ./notify.py
     substituteAllInPlace ./dump-keys.py
     substituteAllInPlace ./type0.sh
     substituteAllInPlace ./type1.sh

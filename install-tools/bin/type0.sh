@@ -2,7 +2,7 @@
 
 set -eux
 
-PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:/run/current-system/sw/bin/:$PATH
+PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@out@/bin:/run/current-system/sw/bin/:$PATH
 
 udevadm settle
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/sda
@@ -24,6 +24,9 @@ mkfs.ext4 -L nixos /dev/sda1
 udevadm settle
 mount /dev/disk/by-label/nixos /mnt
 udevadm settle
+
+notify.py partitioned
+
 nixos-generate-config --root /mnt
 
 packet-config-gen > /mnt/etc/nixos/packet.nix
@@ -33,5 +36,7 @@ cat @type0conf@ > /mnt/etc/nixos/hardware-configuration.nix
 sed -i "s#./hardware-configuration.nix#./hardware-configuration.nix ./standard.nix ./packet.nix#" /mnt/etc/nixos/configuration.nix
 
 nixos-install < /dev/null
+
+notify.py installed
 
 reboot
