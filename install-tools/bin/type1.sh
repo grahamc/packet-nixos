@@ -46,8 +46,5 @@ cat @type1conf@ > /mnt/etc/nixos/hardware-configuration.nix
 
 sed -i "s#./hardware-configuration.nix#./hardware-configuration.nix ./standard.nix ./host-id.nix ./packet.nix#" /mnt/etc/nixos/configuration.nix
 
-nixos-install < /dev/null
-
-notify.py installed
-touch /mnt/etc/.packet-phone-home
-reboot
+do_install
+do_reboot

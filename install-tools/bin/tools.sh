@@ -27,3 +27,16 @@ generate_standard_config() {
     packet-config-gen > /mnt/etc/nixos/packet.nix
     cat @standardconf@ > /mnt/etc/nixos/standard.nix
 }
+
+do_install() {
+    nixos-install < /dev/null
+    udevadm settle
+
+    notify.py installed
+    touch /mnt/etc/.packet-phone-home
+}
+
+do_reboot() {
+    udevadm settle
+    reboot
+}
