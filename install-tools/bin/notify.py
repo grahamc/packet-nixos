@@ -7,27 +7,31 @@ import os
 import sys
 
 def cb_partitioned(url, instance_id):
-    requests.post(
+    requests.put(
         url,
         json={
             "type": "provisioning.105",
             "body": "Server partitions created"
             }
         )
+    print("Announced partitions")
+
 def cb_installed(url, instance_id):
-    requests.post(
+    requests.put(
         url,
         json={
             "type": "provisioning.109",
             "body": "Installation finished, rebooting server"
             }
         )
+    print("Announced installed")
+
 def cb_booted(url, instance_id):
-    requests.put(
-        url,
-        json={
-            "instance_id": instance_id
-            }
+    print(
+        "curl -H 'Content-Type: application/json' -d'{}' {}".format(
+            '{{"instance_id": "{}"}}'.format(instance_id),
+            url
+            )
         )
 
 cbs = {
@@ -49,7 +53,7 @@ while True:
     except:
         pass
 
+
 url = d['phone_home_url']
 instance_id = d['id']
 callback(url, instance_id)
-print("Announced {}".format(sys.argv[1]))

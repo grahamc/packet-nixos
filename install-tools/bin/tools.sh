@@ -2,7 +2,7 @@
 
 set -eux
 
-PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@out@/bin:/run/current-system/sw/bin/:$PATH
+PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@zfs@/bin:@out@/bin:/run/current-system/sw/bin/:$PATH
 
 pre_partition() {
     udevadm settle
@@ -40,7 +40,10 @@ generate_standard_config() {
 }
 
 place_phone_home() {
-    cat @phonehomeconf@ > /mnt/etc/nixos/packet/phone-home.nix
+    cat @phonehomeconf@ \
+        | sed -e "s#CURL_CALL#$(notify.py booted)#" \
+        | cat > /mnt/etc/nixos/packet/phone-home.nix
+
     update_includes_nix
 }
 

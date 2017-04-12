@@ -37,13 +37,14 @@ in pkgs.stdenv.mkDerivation {
   name = "installtools";
   src = ./bin;
 
-  inherit (pkgs) coreutils utillinux e2fsprogs mdadm zfs;
+  inherit (pkgs) coreutils utillinux e2fsprogs zfs;
   inherit packetconfiggen python3;
   standardconf = ./hardware/standard.nix;
   type0conf = ./hardware/type0.nix;
   type1conf = ./hardware/type1.nix;
   type2conf = ./hardware/type2.nix;
   type2aconf = ./hardware/type2a.nix;
+  phonehomeconf = ./phone-home.nix;
 
   buildPhase = ''
     substituteAllInPlace ./dispatch.py

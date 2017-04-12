@@ -6,6 +6,7 @@ let
   install-tools = (import ./install-tools {});
 in {
   imports = [ <nixpkgs/nixos/modules/installer/netboot/netboot-minimal.nix> ];
+  boot.supportedFilesystems = [ "zfs" ];
   networking.hostName = "ipxe";
 
   systemd.services.sshd.wantedBy = mkForce [ "multi-user.target" ];

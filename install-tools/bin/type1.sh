@@ -21,7 +21,7 @@ EOF
 
 }
 
-pre_partitionn
+pre_partition
 partition | fdisk /dev/sda
 partition | fdisk /dev/sdb
 
