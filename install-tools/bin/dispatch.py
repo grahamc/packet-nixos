@@ -19,6 +19,7 @@ scripts = {
     "baremetal_1": "@out@/bin/type1.sh",
     "baremetal_2": "@out@/bin/type2.sh",
     "baremetal_2a": "@out@/bin/type2a.sh",
+    "baremetal_3": "@out@/bin/type3.sh",
 }
 
 if plan in scripts:

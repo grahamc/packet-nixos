@@ -44,6 +44,7 @@ in pkgs.stdenv.mkDerivation {
   type1conf = ./hardware/type1.nix;
   type2conf = ./hardware/type2.nix;
   type2aconf = ./hardware/type2a.nix;
+  type3conf = ./hardware/type3.nix;
   phonehomeconf = ./phone-home.nix;
 
   buildPhase = ''
@@ -55,6 +56,7 @@ in pkgs.stdenv.mkDerivation {
     substituteAllInPlace ./type1.sh
     substituteAllInPlace ./type2.sh
     substituteAllInPlace ./type2a.sh
+    substituteAllInPlace ./type3.sh
   '';
 
   installPhase = ''
