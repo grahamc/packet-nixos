@@ -10,7 +10,7 @@ d = requests.get('https://metadata.packet.net/metadata').json()
 
 def mkRootPassword(path):
     cfg = """
-      users.users.root.hashedPassword = "{}";
+      users.users.root.initialHashedPassword = "{}";
     """;
 
     with open(path) as cmdline:
