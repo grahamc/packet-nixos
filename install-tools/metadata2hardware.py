@@ -4,8 +4,22 @@ from pprint import pprint
 import json
 import requests
 from glob import glob
+import re
 
 d = requests.get('https://metadata.packet.net/metadata').json()
+
+def mkRootPassword(path):
+    cfg = """
+      users.users.root.hashedPassword = "{}";
+    """;
+
+    with open(path) as cmdline:
+        line = cmdline.read()
+        x = re.search(r'pwhash=([^\s]+)', line)
+        if x:
+            pwhash = x.group(1)
+            return cfg.format(pwhash)
+    return ""
 
 def mkBonds(blob):
     cfg = """
@@ -104,7 +118,8 @@ configParts = [
     mkHostname(d),
     mkBonds(d),
     mkInterfaces(d),
-    mkRootKeys(d)
+    mkRootKeys(d),
+    mkRootPassword('/proc/cmdline')
 ]
 print("{",
 "".join(configParts)
