@@ -33,8 +33,9 @@ else
               -A config.system.build.kernel \
               -A config.system.build.netbootIpxeScript \
               -I nixos-config=./x86-64.nix\
-              --keep-going --keep-failed
+              --keep-going --keep-failed --cores 4
 
-    rsync --progress --ignore-times ./result-3/netboot.ipxe ./result-2/bzImage ./result/initrd \
-          "$1"
+    rsync -v --progress --ignore-times ./result-3/netboot.ipxe ./result-2/bzImage ./result/initrd \
+              "$1"
+
 fi

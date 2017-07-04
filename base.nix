@@ -9,6 +9,16 @@ in {
   boot.supportedFilesystems = [ "zfs" ];
   networking.hostName = "ipxe";
 
+  boot.kernelPackages = pkgs.linuxPackages_4_9;
+  nixpkgs.config.packageOverrides = pkgs:
+  { linux_4_9 = pkgs.linux_4_9.override {
+      extraConfig =
+        ''
+          MLX5_CORE_EN y
+        '';
+    };
+  };
+
   systemd.services.sshd.wantedBy = mkForce [ "multi-user.target" ];
 
   systemd.services.dumpkeys = {
