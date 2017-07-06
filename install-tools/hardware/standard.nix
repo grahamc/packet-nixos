@@ -1,3 +1,0 @@
-{
-  services.openssh.enable = true;
-}

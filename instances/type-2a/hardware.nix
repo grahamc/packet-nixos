@@ -1,10 +1,7 @@
-{ lib, pkgs, config, ... }:
+{ pkgs, ... }:
 {
-  imports = [
-    ./base.nix
-  ];
   boot = {
-    loader = {
+   loader = {
       grub = {
         version = 2;
         efiSupport = true;
@@ -18,12 +15,14 @@
     };
 
     kernelParams = [
-      "initrd=initrd"
-      "cma=0M" "biosdevname=0" "net.ifnames=0" "console=ttyAMA0,115200"
+      "cma=0M" "biosdevname=0" "net.ifnames=0" "console=ttyAMA0"
     ];
     kernelPackages = pkgs.linuxPackages_4_9;
   };
 
+  nix = {
+    maxJobs = 96;
+  };
   nixpkgs = {
     system = "aarch64-linux";
   };

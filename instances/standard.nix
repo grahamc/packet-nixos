@@ -1,0 +1,7 @@
+{
+  services = {
+    openssh = {
+      enable = true;
+    };
+  };
+}

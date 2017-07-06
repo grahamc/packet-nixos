@@ -1,11 +1,16 @@
 { config, lib, pkgs, ... }:
 {
-  nixpkgs.config.packageOverrides = pkgs:
-  { linux_4_9 = pkgs.linux_4_9.override {
-      extraConfig =
-        ''
-          MLX5_CORE_EN y
-        '';
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+      packageOverrides = pkgs:
+      { linux_4_9 = pkgs.linux_4_9.override {
+          extraConfig =
+            ''
+              MLX5_CORE_EN y
+            '';
+        };
+      };
     };
   };
 
@@ -21,23 +26,6 @@
     kernelModules = [ "kvm-intel" ];
     kernelParams =  [ "console=ttyS1,115200n8" ];
     extraModulePackages = [ ];
-    loader = {
-      grub = {
-        zfsSupport = true;
-        devices = [
-          "/dev/sdc"
-        ];
-      };
-    };
-  };
-
-  services.zfs.autoScrub.enable = true;
-
-  fileSystems = {
-    "/" = {
-      device = "rpool/root";
-      fsType = "zfs";
-    };
   };
 
   hardware = {

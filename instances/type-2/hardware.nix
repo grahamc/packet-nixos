@@ -1,8 +1,15 @@
 {
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+    };
+  };
+
   boot = {
+    supportedFilesystems = [ "zfs" ];
     initrd = {
       availableKernelModules = [
-        "ehci_pci" "ahci" "usbhid" "sd_mod"
+        "xhci_pci" "ehci_pci" "ahci" "megaraid_sas" "sd_mod"
       ];
     };
     kernelModules = [ "kvm-intel" ];
@@ -10,15 +17,8 @@
     extraModulePackages = [ ];
     loader = {
       grub = {
-        devices = [ "/dev/sda" ];
+        zfsSupport = true;
       };
-    };
-  };
-
-  fileSystems = {
-    "/" = {
-      device = "/dev/disk/by-label/nixos";
-      fsType = "ext4";
     };
   };
 
@@ -27,6 +27,6 @@
   };
 
   nix = {
-    maxJobs = 4;
+    maxJobs = 48;
   };
 }

@@ -1,5 +1,11 @@
 { config, lib, pkgs, ... }:
 {
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+    };
+  };
+
   boot = {
     supportedFilesystems = [ "zfs" ];
     initrd = {
@@ -10,21 +16,6 @@
     kernelModules = [ "kvm-intel" ];
     kernelParams =  [ "console=ttyS1,115200n8" ];
     extraModulePackages = [ ];
-    loader = {
-      grub = {
-        zfsSupport = true;
-        devices = [ "/dev/sda" "/dev/sdb" ];
-      };
-    };
-  };
-
-  services.zfs.autoScrub.enable = true;
-
-  fileSystems = {
-    "/" = {
-      device = "rpool/root/nixos";
-      fsType = "zfs";
-    };
   };
 
   hardware = {

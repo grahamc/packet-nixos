@@ -39,26 +39,12 @@ in pkgs.stdenv.mkDerivation {
 
   inherit (pkgs) coreutils utillinux e2fsprogs zfs;
   inherit packetconfiggen python3;
-  standardconf = ./hardware/standard.nix;
-  type0conf = ./hardware/type0.nix;
-  type1conf = ./hardware/type1.nix;
-  type2conf = ./hardware/type2.nix;
-  type2aconf = ./hardware/type2a.nix;
-  type3conf = ./hardware/type3.nix;
-  typesconf = ./hardware/type-s.nix;
   phonehomeconf = ./phone-home.nix;
 
   buildPhase = ''
-    substituteAllInPlace ./dispatch.py
     substituteAllInPlace ./notify.py
     substituteAllInPlace ./dump-keys.py
     substituteAllInPlace ./tools.sh
-    substituteAllInPlace ./type0.sh
-    substituteAllInPlace ./type1.sh
-    substituteAllInPlace ./type2.sh
-    substituteAllInPlace ./type2a.sh
-    substituteAllInPlace ./type3.sh
-    substituteAllInPlace ./type-s.sh
   '';
 
   installPhase = ''

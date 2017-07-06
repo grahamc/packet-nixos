@@ -9,8 +9,8 @@ ident() {
 
 sync() {
     echo "Syncing"
-    rsync -avp . zoidberg.gsc.io:gsc.io/public/nixos-packet-ts
-    ssh zoidberg.gsc.io /bin/sh -c "'cd gsc.io/public/nixos-packet-ts && pwd && ./pxe.sh ./ x86-64 '"
+    rsync -avp . zoidberg.gsc.io:gsc.io/public/nixos-packet/
+    ssh zoidberg.gsc.io /bin/sh -c "'cd gsc.io/public/nixos-packet && pwd && ./all.sh'"
     printf "\n\n\n\n\n\nFinished\n"
 }
 
