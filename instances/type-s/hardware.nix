@@ -14,25 +14,18 @@
     };
   };
 
-  boot = {
-    kernelPackages = pkgs.linuxPackages_4_9;
+  boot.kernelPackages = pkgs.linuxPackages_4_9;
 
-    supportedFilesystems = [ "zfs" ];
-    initrd = {
-      availableKernelModules = [
-        "ahci" "xhci_pci" "ehci_pci" "mpt3sas" "usbhid" "sd_mod"
-      ];
-    };
-    kernelModules = [ "kvm-intel" ];
-    kernelParams =  [ "console=ttyS1,115200n8" ];
-    extraModulePackages = [ ];
-  };
+  boot.supportedFilesystems = [ "zfs" ];
+  boot.initrd.availableKernelModules = [
+    "ahci" "xhci_pci" "ehci_pci" "mpt3sas" "usbhid" "sd_mod"
+  ];
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.kernelParams =  [ "console=ttyS1,115200n8" ];
+  boot.extraModulePackages = [ ];
+  boot.loader.grub.zfsSupport = true;
 
-  hardware = {
-    enableAllFirmware = true;
-  };
+  hardware.enableAllFirmware = true;
 
-  nix = {
-    maxJobs = 32;
-  };
+  nix.maxJobs = 32;
 }

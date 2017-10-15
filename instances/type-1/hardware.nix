@@ -1,28 +1,16 @@
-{ config, lib, pkgs, ... }:
 {
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-    };
-  };
+  nixpkgs.config.allowUnfree = true;
 
-  boot = {
-    supportedFilesystems = [ "zfs" ];
-    initrd = {
-      availableKernelModules = [
-        "xhci_pci" "ehci_pci" "ahci" "usbhid" "sd_mod"
-      ];
-    };
-    kernelModules = [ "kvm-intel" ];
-    kernelParams =  [ "console=ttyS1,115200n8" ];
-    extraModulePackages = [ ];
-  };
+  boot.supportedFilesystems = [ "zfs" ];
+  boot.initrd.availableKernelModules = [
+    "xhci_pci" "ehci_pci" "ahci" "usbhid" "sd_mod"
+  ];
 
-  hardware = {
-    enableAllFirmware = true;
-  };
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.kernelParams =  [ "console=ttyS1,115200n8" ];
+  boot.extraModulePackages = [ ];
 
-  nix = {
-    maxJobs = 8;
-  };
+  hardware.enableAllFirmware = true;
+
+  nix.maxJobs = 8;
 }

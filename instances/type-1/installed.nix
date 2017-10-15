@@ -1,12 +1,6 @@
 {
-  boot = {
-    loader = {
-      grub = {
-        zfsSupport = true;
-        devices = [ "/dev/sda" "/dev/sdb" ];
-      };
-    };
-  };
+  boot.loader.grub.zfsSupport = true;
+  boot.loader.grub.devices = [ "/dev/sda" "/dev/sdb" ];
 
   services.zfs.autoScrub.enable = true;
 

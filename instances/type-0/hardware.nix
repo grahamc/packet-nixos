@@ -1,26 +1,15 @@
 {
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-    };
-  };
+  nixpkgs.config.allowUnfree = true;
 
-  boot = {
-    initrd = {
-      availableKernelModules = [
-        "ehci_pci" "ahci" "usbhid" "sd_mod"
-      ];
-    };
-    kernelModules = [ "kvm-intel" ];
-    kernelParams =  [ "console=ttyS1,115200n8" ];
-    extraModulePackages = [ ];
-  };
+  boot.initrd.availableKernelModules = [
+    "ehci_pci" "ahci" "usbhid" "sd_mod"
+  ];
 
-  hardware = {
-    enableAllFirmware = true;
-  };
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.kernelParams =  [ "console=ttyS1,115200n8" ];
+  boot.extraModulePackages = [ ];
 
-  nix = {
-    maxJobs = 4;
-  };
+  hardware.enableAllFirmware = true;
+
+  nix.maxJobs = 4;
 }
