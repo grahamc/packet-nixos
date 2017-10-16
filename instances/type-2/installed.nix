@@ -1,13 +1,19 @@
 { ... }:
 {
   boot.loader.grub.devices = [
-    "/dev/sda" "/dev/sdb" "/dev/sdc" "/dev/sdd" "/dev/sde" "/dev/sdf"
+    "/dev/sda"
   ];
 
   fileSystems = {
     "/" = {
-      device = "rpool/root/nixos";
-      fsType = "zfs";
+      label = "nixos";
+      fsType = "ext4";
     };
   };
+
+  swapDevices = [
+    {
+      label = "swap";
+    }
+  ];
 }

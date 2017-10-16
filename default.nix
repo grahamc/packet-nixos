@@ -273,24 +273,19 @@ in rec {
     ];
 
     partition = ''
-      ${partitionOneZFS "/dev/sda"}
-      ${partitionOneZFS "/dev/sdb"}
-      ${partitionOneZFS "/dev/sdc"}
-      ${partitionOneZFS "/dev/sdd"}
-      ${partitionOneZFS "/dev/sde"}
-      ${partitionOneZFS "/dev/sdf"}
+      # /dev/sda2 on /boot type ext4
+      # /dev/sda4 on / type ext4
+      ${partitionLinuxWithBootSwap "/dev/sda"}
     '';
 
     format = ''
-      zpool create -o ashift=12 rpool raidz2 /dev/sda1 /dev/sdb1 /dev/sdc1 /dev/sdd1 /dev/sde1 /dev/sdf1
-
-      # since all the disks are the same, I'm skipping the SLOG and L2ARC
-      zfs create -o mountpoint=none rpool/root
-      zfs create -o compression=lz4 -o mountpoint=legacy rpool/root/nixos
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
     '';
 
     mount = ''
-      mount -t zfs rpool/root/nixos /mnt
+      swapon -L swap
+      mount -L nixos /mnt
     '';
   };
 
