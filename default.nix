@@ -177,13 +177,15 @@ in rec {
       ./instances/type-0/installed.nix
     ];
 
-    partition = partitionOneLinux "/dev/sda";
+    partition = partitionLinuxWithSwap "/dev/sda";
 
     format = ''
-      mkfs.ext4 -L nixos /dev/sda1
+      mkswap -L swap /dev/sda1
+      mkfs.ext4 -L nixos /dev/sda2
     '';
 
     mount = ''
+      swapon /dev/sda1
       mount /dev/disk/by-label/nixos /mnt
     '';
   };
