@@ -36,9 +36,7 @@ let
               inherit partition format mount;
               type = "${name}-${system}";
               configFiles = configFiles ++ runTimeConfigFiles;
-              runTimeNixOS = (builtins.trace
-                (builtins.attrNames runTimeNixOS.system)
-                "${runTimeNixOS.system}");
+              runTimeNixOS = "${runTimeNixOS.system}";
             };
           }
         ];
@@ -90,6 +88,54 @@ let
     EOF
   '';
 
+  partitionLinuxWithBootSwap = disk: ''
+    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${disk}
+      o # clear the in memory partition table
+      n # new partition
+      p # primary partition
+      1 # partition number 1
+        # default - start at beginning of diskp
+      +500M # 500MB for /boot
+      n # new partition
+      p # primary partition
+      2 # partition number 2
+        # default - start at beginning of disk
+      +2G # 2G for swap
+      n # New partition
+      p # Primary
+      3 # #3, primary disk
+        # default start
+        # default, extend partition to end of disk
+      t # change type
+      1 # partition 1
+      ef # Type EFI
+      p # print the in-memory partition table
+      w # write the partition table
+    EOF
+  '';
+
+  partitionLinuxWithSwap = disk: ''
+    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${disk}
+      o # clear the in memory partition table
+      n # New partition
+      p # Primary
+      1 # Partition #1
+        # default, extend after the previous
+      +2G # 2G partition for swap
+      n # New partition
+      p # Primary
+      2 # #2
+        # default start
+        # default, extend partition to end of disk
+      t # change type
+      2 # Partition #2
+      ef # Type EFI
+      p # print the in-memory partition table
+      w # write the partition table
+    EOF
+  '';
+
+
   partitionOneZFS = disk: ''
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${disk}
       o # clear the in memory partition table
@@ -106,9 +152,17 @@ let
     EOF
   '';
 
-in
+in rec {
+  all-x86-64 = pkgs.runCommand "nixos-all-x86-64" {}
+    ''
+      mkdir $out
+      ln -s ${type-0} $out/type-0
+      ln -s ${type-1} $out/type-1
+      ln -s ${type-2} $out/type-2
+      ln -s ${type-3} $out/type-3
+      ln -s ${type-s} $out/type-s
+    '';
 
-{
   type-0 = mkPXEInstaller {
     name = "type-0";
     system = "x86_64-linux";
@@ -149,20 +203,23 @@ in
     ];
 
     partition = ''
-      ${partitionOneZFS "/dev/sda"}
-      ${partitionOneZFS "/dev/sdb"}
+      ${partitionLinuxWithBootSwap "/dev/sda"}
+      sfdisk -d /dev/sda | sfdisk /dev/sdb
+
+      udevadm settle
+
+      yes | mdadm --create --verbose /dev/md0 --level=1 /dev/sda2 /dev/sdb2 -n2
+      yes | mdadm --create --verbose /dev/md1 --level=1 /dev/sda3 /dev/sdb3 -n2
     '';
 
     format = ''
-      zpool create -o ashift=12 rpool raidz /dev/sda1 /dev/sdb1
-
-      # since all the disks are the same, I'm skipping the SLOG and L2ARC
-      zfs create -o mountpoint=none rpool/root
-      zfs create -o compression=lz4 -o mountpoint=legacy rpool/root/nixos
+      mkswap -L swap /dev/md0
+      mkfs.ext4 -L nixos /dev/md1
     '';
 
     mount = ''
-      mount -t zfs rpool/root/nixos /mnt
+      swapon -L swap
+      mount -L nixos /mnt
     '';
   };
 
@@ -291,6 +348,5 @@ in
     mount = ''
       mount -t zfs rpool/root /mnt
     '';
-
   };
 }

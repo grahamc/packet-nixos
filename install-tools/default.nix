@@ -1,6 +1,6 @@
 { pkgs ? import <nixpkgs> {}}:
 let
-  python3 = (pkgs.python3.withPackages (ps: [ps.requests2]));
+  python3 = (pkgs.python3.withPackages (ps: [ps.requests]));
 
   packetconfiggen = pkgs.stdenv.mkDerivation rec {
     name = "packetconfiggen";
