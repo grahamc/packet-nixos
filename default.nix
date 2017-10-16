@@ -304,20 +304,23 @@ in rec {
     ];
 
     partition = ''
-      ${partitionOneZFS "/dev/sda"}
-      ${partitionOneZFS "/dev/sdb"}
+      ${partitionLinuxWithBootSwap "/dev/sda"}
+      sfdisk -d /dev/sda | sfdisk /dev/sdb
+
+      udevadm settle
+
+      yes | mdadm --create --verbose /dev/md0 --level=1 /dev/sda2 /dev/sdb2 -n2
+      yes | mdadm --create --verbose /dev/md1 --level=1 /dev/sda3 /dev/sdb3 -n2
     '';
 
     format = ''
-      zpool create -o ashift=12 rpool raidz /dev/sda1 /dev/sdb1
-
-      # since all the disks are the same, I'm skipping the SLOG and L2ARC
-      zfs create -o mountpoint=none rpool/root
-      zfs create -o compression=lz4 -o mountpoint=legacy rpool/root/nixos
+      mkswap -L swap /dev/md0
+      mkfs.ext4 -L nixos /dev/md1
     '';
 
     mount = ''
-      mount -t zfs rpool/root/nixos /mnt
+      swapon -L swap
+      mount -L nixos /mnt
     '';
   };
 
