@@ -7,4 +7,10 @@
       fsType = "ext4";
     };
   };
+
+  swapDevices = [
+    {
+      label = "swap";
+    }
+  ];
 }
