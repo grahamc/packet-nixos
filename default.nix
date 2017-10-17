@@ -273,8 +273,6 @@ in rec {
     ];
 
     partition = ''
-      # /dev/sda2 on /boot type ext4
-      # /dev/sda4 on / type ext4
       ${partitionLinuxWithBootSwap "/dev/sda"}
     '';
 
@@ -338,15 +336,18 @@ in rec {
       ./instances/type-s/installed.nix
     ];
 
-    partition = partitionOneZFS "/dev/sdc";
+    partition = ''
+      ${partitionLinuxWithBootSwap "/dev/sdo"}
+    '';
 
     format = ''
-      zpool create -o ashift=12 rpool /dev/sdc1
-      zfs create -o compression=lz4 -o mountpoint=legacy rpool/root
+      mkswap -L swap /dev/sdo2
+      mkfs.ext4 -L nixos /dev/sdo3
     '';
 
     mount = ''
-      mount -t zfs rpool/root /mnt
+      swapon -L swap
+      mount -L nixos /mnt
     '';
   };
 }

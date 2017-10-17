@@ -1,13 +1,16 @@
 {
-  boot.loader.grub.zfsSupport = true;
-  boot.loader.grub.devices = [ "/dev/sdc" ];
-
-  services.zfs.autoScrub.enable = true;
+  boot.loader.grub.devices = [ "/dev/sdo" ];
 
   fileSystems = {
     "/" = {
-      device = "rpool/root";
-      fsType = "zfs";
+      label = "nixos";
+      fsType = "ext4";
     };
   };
+
+  swapDevices = [
+    {
+      label = "swap";
+    }
+  ];
 }
