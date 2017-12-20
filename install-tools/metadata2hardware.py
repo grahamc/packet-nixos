@@ -50,11 +50,29 @@ def mkNetworking(blob):
 
       networking.dhcpcd.enable = false;
 
+      networking.defaultGateway = {{
+        address =  "{gateway}";
+        interface = "bond0";
+      }};
+
+      networking.defaultGateway6 = {{
+        address = "{gateway6}";
+        interface = "bond0";
+      }};
     """
 
     vals = {
         'hostname': blob['hostname'],
     }
+
+    for address in blob['network']['addresses']:
+        if not (address['enabled'] and address['public']):
+            continue
+
+        if address['address_family'] == 4:
+            vals['gateway'] = address['gateway']
+        elif address['address_family'] == 6:
+            vals['gateway6'] = address['gateway']
 
     return cfg.format(**vals)
 
