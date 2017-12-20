@@ -47,6 +47,9 @@ def mkBonds(blob):
 def mkNetworking(blob):
     cfg = """
       networking.hostName = "{hostname}";
+
+      networking.dhcpcd.enable = false;
+
     """
 
     vals = {
@@ -59,8 +62,6 @@ def mkNetworking(blob):
 def mkInterfaces(blob):
     cfg = """
       networking.interfaces.bond0 = {{
-        useDHCP = true;
-
         ip4 = [\n{ip4s}
         ];
 
