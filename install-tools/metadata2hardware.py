@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-from pprint import pprint
-import json
 import requests
 from glob import glob
 import re
