@@ -6,33 +6,25 @@ import requests
 import os
 import sys
 
+
 def cb_partitioned(url, instance_id):
-    requests.put(
-        url,
-        json={
-            "type": "provisioning.105",
-            "body": "Server partitions created"
-            }
-        )
+    requests.put(url, json={"type": "provisioning.105", "body": "Server partitions created"})
     print("Announced partitions")
+
 
 def cb_installed(url, instance_id):
     requests.put(
-        url,
-        json={
+        url, json={
             "type": "provisioning.109",
             "body": "Installation finished, rebooting server"
-            }
-        )
+        })
     print("Announced installed")
 
+
 def cb_booted(url, instance_id):
-    print(
-        "curl -H 'Content-Type: application/json' -d'{}' {}".format(
-            '{{"instance_id": "{}"}}'.format(instance_id),
-            url
-            )
-        )
+    print("curl -H 'Content-Type: application/json' -d'{}' {}".format(
+        '{{"instance_id": "{}"}}'.format(instance_id), url))
+
 
 cbs = {
     "partitioned": cb_partitioned,
@@ -52,7 +44,6 @@ while True:
         break
     except:
         pass
-
 
 url = d['phone_home_url']
 instance_id = d['id']
