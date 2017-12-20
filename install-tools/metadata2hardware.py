@@ -44,12 +44,16 @@ def mkBonds(blob):
     return cfg.format(mode=mode, interfaces=" ".join(interfaces))
 
 
-def mkHostname(blob):
+def mkNetworking(blob):
     cfg = """
-      networking.hostName = "{}";
+      networking.hostName = "{hostname}";
     """
 
-    return cfg.format(blob['hostname'])
+    vals = {
+        'hostname': blob['hostname'],
+    }
+
+    return cfg.format(**vals)
 
 
 def mkInterfaces(blob):
@@ -99,7 +103,7 @@ def mkRootKeys(blob):
 
 
 configParts = [
-    mkHostname(d),
+    mkNetworking(d),
     mkBonds(d),
     mkInterfaces(d),
     mkRootKeys(d),
