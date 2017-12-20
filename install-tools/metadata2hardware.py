@@ -44,7 +44,7 @@ def mkBonds(blob):
     return cfg.format(mode=mode, interfaces=" ".join(interfaces))
 
 
-def mkNetworking(blob):
+def mkNetworking(blob, path):
     cfg = """
       networking.hostName = "{hostname}";
 
@@ -59,6 +59,9 @@ def mkNetworking(blob):
         address = "{gateway6}";
         interface = "bond0";
       }};
+
+      networking.nameservers = [\n{nameservers}
+      ];
     """
 
     vals = {
@@ -73,6 +76,23 @@ def mkNetworking(blob):
             vals['gateway'] = address['gateway']
         elif address['address_family'] == 6:
             vals['gateway6'] = address['gateway']
+
+    nses = []
+    with open(path) as resolvconf:
+        for line in resolvconf:
+            x = re.search(r'^nameserver\s+([^\s]+)', line)
+            if x:
+                nses.append(x.group(1))
+
+    if not nses:
+        nses = [
+            '147.75.207.207',
+            '147.75.207.208',
+        ]
+
+    vals['nameservers'] = '\n'.join(['        "%s"' % ns for ns in nses])
+    for exp in ('hostname', 'gateway', 'gateway6', 'nameservers'):
+        assert exp in vals, 'missing configuration data: %s' % exp
 
     return cfg.format(**vals)
 
@@ -122,7 +142,7 @@ def mkRootKeys(blob):
 
 
 configParts = [
-    mkNetworking(d),
+    mkNetworking(d, '/etc/resolv.conf'),
     mkBonds(d),
     mkInterfaces(d),
     mkRootKeys(d),
