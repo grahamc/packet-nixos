@@ -180,18 +180,18 @@ in rec {
     '';
   };
 
-  type-1 = mkPXEInstaller {
-    name = "type-1";
+  "c1-small-x86" = mkPXEInstaller {
+    name = "c1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-1/hardware.nix
+      ./instances/c1.small.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-1/installed.nix
+      ./instances/c1.small.x86/installed.nix
     ];
 
     partition = ''
