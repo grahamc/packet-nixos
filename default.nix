@@ -163,18 +163,18 @@ in rec {
       ln -s ${type-s} $out/type-s
     '';
 
-  type-0 = mkPXEInstaller {
-    name = "type-0";
+  t1-small-x86 = mkPXEInstaller {
+    name = "t1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-0/hardware.nix
+      ./instances/t1.small.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-0/installed.nix
+      ./instances/t1.small.x86/installed.nix
     ];
 
     partition = partitionLinuxWithSwap "/dev/sda";
