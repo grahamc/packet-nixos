@@ -215,23 +215,23 @@ in rec {
     '';
   };
 
-  type-2a = mkPXEInstaller {
-    name = "type-2a";
+  c1-large-arm = mkPXEInstaller {
+    name = "c1.large.arm";
     system = "aarch64-linux";
     img = "Image";
 
     installTimeConfigFiles = [
       ./base.nix
-      ./instances/type-2a/installer.nix
+      ./instances/c1.large.arm/installer.nix
     ];
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-2a/hardware.nix
+      ./instances/c1.large.arm/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-2a/installed.nix
+      ./instances/c1.large.arm/installed.nix
     ];
 
     partition = partitionLinuxWithBoot "/dev/sda";
