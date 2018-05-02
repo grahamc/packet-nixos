@@ -153,16 +153,6 @@ let
   '';
 
 in rec {
-  all-x86-64 = pkgs.runCommand "nixos-all-x86-64" {}
-    ''
-      mkdir $out
-      ln -s ${type-0} $out/type-0
-      ln -s ${type-1} $out/type-1
-      ln -s ${type-2} $out/type-2
-      ln -s ${type-3} $out/type-3
-      ln -s ${type-s} $out/type-s
-    '';
-
   t1-small-x86 = mkPXEInstaller {
     name = "t1.small.x86";
     system = "x86_64-linux";
