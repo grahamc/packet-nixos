@@ -36,3 +36,21 @@ It will output them all to `./nixos-ipxe-<type>/`
 
 Check out ./default.nix for how the partitioning and formatting are
 done. Per-instance config types are in ./instances/.
+
+
+---
+
+todo:
+
+  c2.medium
+  x1.small
+  m2.xlarge.x86
+
+---
+
+x t1.small.x86
+x c1.small.x86
+x m1.xlarge.x86
+x c1.large.arm
+x c1.xlarge.x86
+x s1.large.x86

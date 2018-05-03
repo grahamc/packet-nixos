@@ -180,7 +180,7 @@ in rec {
     '';
   };
 
-  "c1-small-x86" = mkPXEInstaller {
+  c1-small-x86 = mkPXEInstaller {
     name = "c1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
