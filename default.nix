@@ -277,18 +277,18 @@ in rec {
     '';
   };
 
-  type-3 = mkPXEInstaller {
-    name = "type-3";
+  c1.xlarge.x86 = mkPXEInstaller {
+    name = "c1.xlarge.x86";
     system = "x86_64-linux";
     img = "bzImage";
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-3/hardware.nix
+      ./instances/c1.xlarge.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-3/installed.nix
+      ./instances/c1.xlarge.x86/installed.nix
     ];
 
     partition = ''
