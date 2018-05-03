@@ -312,18 +312,18 @@ in rec {
     '';
   };
 
-  type-s = mkPXEInstaller {
-    name = "type-s";
+  s1.large.x86 = mkPXEInstaller {
+    name = "s1.large.x86";
     system ="x86_64-linux";
     img = "bzImage";
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-s/hardware.nix
+      ./instances/s1.large.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-s/installed.nix
+      ./instances/s1.large.x86/installed.nix
     ];
 
     partition = ''
