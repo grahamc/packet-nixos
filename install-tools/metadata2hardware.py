@@ -57,10 +57,10 @@ def mkInterfaces(blob):
       networking.interfaces.bond0 = {{
         useDHCP = true;
 
-        ip4 = [\n{ip4s}
+        ipv4.addresses = [\n{ip4s}
         ];
 
-        ip6 = [\n{ip6s}
+        ipv6.addresses = [\n{ip6s}
         ];
       }};
     """
