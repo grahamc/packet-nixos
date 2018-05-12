@@ -350,23 +350,23 @@ in rec {
 
     configFiles = [
       ./instances/standard.nix
-      # ./instances/c2.medium.x86/hardware.nix
+      ./instances/c2.medium.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      # ./instances/c2.medium.x86/installed.nix
+      ./instances/c2.medium.x86/installed.nix
     ];
 
-    partition = ''
-      exit 1
-    '';
+    partition = partitionLinuxWithBootSwap "/dev/sda";
 
     format = ''
-      exit 1
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
     '';
 
     mount = ''
-      exit 1
+      swapon -L swap
+      mount -L nixos /mnt
     '';
   };
 
