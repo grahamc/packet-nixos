@@ -98,31 +98,45 @@ def mkInterfaces(blob):
       networking.interfaces.bond0 = {{
         useDHCP = true;
 
-        ipv4.addresses = [\n{ip4s}
-        ];
+        ipv4 = {{
+          routes = [
+            {{
+              address = "10.0.0.0";
+              prefixLength = 8;
+              via = "{privateipv4gateway}";
+            }}
+          ];
+          addresses = [\n{ip4s}
+          ];
+        }};
 
-        ipv6.addresses = [\n{ip6s}
-        ];
+        ipv6 = {{
+          addresses = [\n{ip6s}
+          ];
+        }};
       }};
     """
 
-    ipPart = """          {{
-            address = "{address}";
-            prefixLength = {prefix};
-          }}"""
+    ipPart = """            {{
+              address = "{address}";
+              prefixLength = {prefix};
+            }}"""
 
+    privateipv4gateway = ""
     ip4s = []
     ip6s = []
 
     for address in blob['network']['addresses']:
         if address['enabled']:
+            if not address['public']:
+                privateipv4gateway = address['gateway']
             part = ipPart.format(address=address['address'], prefix=address['cidr'])
             if address['address_family'] == 4:
                 ip4s.append(part)
             elif address['address_family'] == 6:
                 ip6s.append(part)
 
-    return cfg.format(ip4s="\n".join(ip4s), ip6s="\n".join(ip6s))
+    return cfg.format(ip4s="\n".join(ip4s), ip6s="\n".join(ip6s), privateipv4gateway=privateipv4gateway)
 
 
 def mkRootKeys(blob):
