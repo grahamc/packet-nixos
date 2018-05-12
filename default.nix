@@ -340,4 +340,85 @@ in rec {
       mount -L nixos /mnt
     '';
   };
+
+  c2-medium-x86 = mkPXEInstaller {
+    name = "c2.medium.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+
+    configFiles = [
+      ./instances/standard.nix
+      # ./instances/c2.medium.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      # ./instances/c2.medium.x86/installed.nix
+    ];
+
+    partition = ''
+      exit 1
+    '';
+
+    format = ''
+      exit 1
+    '';
+
+    mount = ''
+      exit 1
+    '';
+  };
+
+  x1-small-x86 = mkPXEInstaller {
+    name = "x1.small.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+
+    configFiles = [
+      ./instances/standard.nix
+      # ./instances/x1.small.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      # ./instances/x1.small.x86/installed.nix
+    ];
+
+    partition = ''
+      exit 1
+    '';
+
+    format = ''
+      exit 1
+    '';
+
+    mount = ''
+      exit 1
+    '';
+  };
+
+  m2-xlarge-x86 = mkPXEInstaller {
+    name = "m2.xlarge.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+
+    configFiles = [
+      ./instances/standard.nix
+      # ./instances/m2.xlarge.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      # ./instances/m2.xlarge.x86/installed.nix
+    ];
+
+    partition = ''
+      exit 1
+    '';
+
+    format = ''
+      exit 1
+    '';
+
+    mount = ''
+      exit 1
+    '';
+  };
 }
