@@ -277,7 +277,7 @@ in rec {
     '';
   };
 
-  c1.xlarge.x86 = mkPXEInstaller {
+  c1-xlarge-x86 = mkPXEInstaller {
     name = "c1.xlarge.x86";
     system = "x86_64-linux";
     img = "bzImage";
@@ -312,7 +312,7 @@ in rec {
     '';
   };
 
-  s1.large.x86 = mkPXEInstaller {
+  s1-large-x86 = mkPXEInstaller {
     name = "s1.large.x86";
     system ="x86_64-linux";
     img = "bzImage";
