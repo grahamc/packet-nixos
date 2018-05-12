@@ -377,50 +377,23 @@ in rec {
 
     configFiles = [
       ./instances/standard.nix
-      # ./instances/x1.small.x86/hardware.nix
+      ./instances/x1.small.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      # ./instances/x1.small.x86/installed.nix
+      ./instances/x1.small.x86/installed.nix
     ];
 
-    partition = ''
-      exit 1
-    '';
+    partition = partitionLinuxWithBootSwap "/dev/sda";
 
     format = ''
-      exit 1
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
     '';
 
     mount = ''
-      exit 1
-    '';
-  };
-
-  m2-xlarge-x86 = mkPXEInstaller {
-    name = "m2.xlarge.x86";
-    system = "x86_64-linux";
-    img = "bzImage";
-
-    configFiles = [
-      ./instances/standard.nix
-      # ./instances/m2.xlarge.x86/hardware.nix
-    ];
-
-    runTimeConfigFiles = [
-      # ./instances/m2.xlarge.x86/installed.nix
-    ];
-
-    partition = ''
-      exit 1
-    '';
-
-    format = ''
-      exit 1
-    '';
-
-    mount = ''
-      exit 1
+      swapon -L swap
+      mount -L nixos /mnt
     '';
   };
 }
