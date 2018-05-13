@@ -348,6 +348,11 @@ in rec {
     system = "x86_64-linux";
     img = "bzImage";
 
+    installTimeConfigFiles = [
+      ./base.nix
+      ./instances/c2.medium.x86/installer.nix
+    ];
+
     configFiles = [
       ./instances/standard.nix
       ./instances/c2.medium.x86/hardware.nix
@@ -360,6 +365,7 @@ in rec {
     partition = partitionLinuxWithBootSwap "/dev/sda";
 
     format = ''
+      mkfs.vfat /dev/sda1
       mkswap -L swap /dev/sda2
       mkfs.ext4 -L nixos /dev/sda3
     '';
@@ -367,6 +373,8 @@ in rec {
     mount = ''
       swapon -L swap
       mount -L nixos /mnt
+      mkdir -p /mnt/boot/efi
+      mount /dev/sda1 /mnt/boot/efi
     '';
   };
 
