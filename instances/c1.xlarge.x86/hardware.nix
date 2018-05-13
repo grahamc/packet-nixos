@@ -3,9 +3,18 @@
   nixpkgs = {
     config = {
       allowUnfree = true;
+      packageOverrides = pkgs: {
+        linux_latest = pkgs.linux_latest.override {
+        extraConfig =
+          ''
+            MLX5_CORE_EN y
+          '';
+        };
+      };
     };
   };
 
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.initrd.availableKernelModules = [
     "xhci_pci" "ehci_pci" "ahci" "usbhid" "sd_mod" "megaraid_sas"
     "nvme"

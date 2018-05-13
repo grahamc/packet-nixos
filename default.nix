@@ -396,4 +396,31 @@ in rec {
       mount -L nixos /mnt
     '';
   };
+
+  m2-xlarge-x86 = mkPXEInstaller {
+    name = "m2.xlarge.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/m2.xlarge.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/m2.xlarge.x86/installed.nix
+    ];
+
+    partition = partitionLinuxWithBootSwap "/dev/sda";
+
+    format = ''
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
+    '';
+
+    mount = ''
+      swapon -L swap
+      mount -L nixos /mnt
+    '';
+  };
 }
