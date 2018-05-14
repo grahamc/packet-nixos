@@ -329,12 +329,12 @@ in rec {
     ];
 
     partition = ''
-      ${partitionLinuxWithBootSwap "/dev/sdo"}
+      ${partitionLinuxWithBootSwap "/dev/sda"}
     '';
 
     format = ''
-      mkswap -L swap /dev/sdo2
-      mkfs.ext4 -L nixos /dev/sdo3
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
     '';
 
     mount = ''
