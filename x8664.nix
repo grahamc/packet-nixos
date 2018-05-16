@@ -5,7 +5,7 @@ let
     (name: sys: sys.system == "x86_64-linux")
     (import ./default.nix);
    ln = lib.mapAttrsToList (n: v: "ln -s ${v} $out/${n}") filtered;
-in pkgs.runCommand "all-pxe-images" {} ''
+in pkgs.runCommand "x86-pxe-images" {} ''
   mkdir -p $out
   ${lib.concatStringsSep "\n" ln}
 ''
