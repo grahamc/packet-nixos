@@ -44,12 +44,53 @@ def mkBonds(blob):
     return cfg.format(mode=mode, interfaces=" ".join(interfaces))
 
 
-def mkHostname(blob):
+def mkNetworking(blob, path):
     cfg = """
-      networking.hostName = "{}";
+      networking.hostName = "{hostname}";
+      networking.dhcpcd.enable = false;
+      networking.defaultGateway = {{
+        address =  "{gateway}";
+        interface = "bond0";
+      }};
+      networking.defaultGateway6 = {{
+        address = "{gateway6}";
+        interface = "bond0";
+      }};
+      networking.nameservers = [\n{nameservers}
+      ];
     """
 
-    return cfg.format(blob['hostname'])
+    vals = {
+        'hostname': blob['hostname'],
+    }
+
+    for address in blob['network']['addresses']:
+        if not (address['enabled'] and address['public']):
+            continue
+
+        if address['address_family'] == 4:
+            vals['gateway'] = address['gateway']
+        elif address['address_family'] == 6:
+            vals['gateway6'] = address['gateway']
+
+    nameservers = []
+    with open(path) as resolvconf:
+        for line in resolvconf:
+            x = re.search(r'^nameserver\s+([^\s]+)', line)
+            if x:
+                nameservers.append(x.group(1))
+
+    if not nameservers:
+        nameservers = [
+            '147.75.207.207',
+            '147.75.207.208',
+        ]
+
+    vals['nameservers'] = '\n'.join(['        "%s"' % ns for ns in nameservers])
+    for exp in ('hostname', 'gateway', 'gateway6', 'nameservers'):
+        assert exp in vals, 'missing configuration data: %s' % exp
+
+    return cfg.format(**vals)
 
 
 def mkInterfaces(blob):
@@ -57,31 +98,45 @@ def mkInterfaces(blob):
       networking.interfaces.bond0 = {{
         useDHCP = true;
 
-        ip4 = [\n{ip4s}
-        ];
+        ipv4 = {{
+          routes = [
+            {{
+              address = "10.0.0.0";
+              prefixLength = 8;
+              via = "{privateipv4gateway}";
+            }}
+          ];
+          addresses = [\n{ip4s}
+          ];
+        }};
 
-        ip6 = [\n{ip6s}
-        ];
+        ipv6 = {{
+          addresses = [\n{ip6s}
+          ];
+        }};
       }};
     """
 
-    ipPart = """          {{
-            address = "{address}";
-            prefixLength = {prefix};
-          }}"""
+    ipPart = """            {{
+              address = "{address}";
+              prefixLength = {prefix};
+            }}"""
 
+    privateipv4gateway = ""
     ip4s = []
     ip6s = []
 
     for address in blob['network']['addresses']:
         if address['enabled']:
+            if not address['public']:
+                privateipv4gateway = address['gateway']
             part = ipPart.format(address=address['address'], prefix=address['cidr'])
             if address['address_family'] == 4:
                 ip4s.append(part)
             elif address['address_family'] == 6:
                 ip6s.append(part)
 
-    return cfg.format(ip4s="\n".join(ip4s), ip6s="\n".join(ip6s))
+    return cfg.format(ip4s="\n".join(ip4s), ip6s="\n".join(ip6s), privateipv4gateway=privateipv4gateway)
 
 
 def mkRootKeys(blob):
@@ -99,7 +154,7 @@ def mkRootKeys(blob):
 
 
 configParts = [
-    mkHostname(d),
+    mkNetworking(d, "/etc/resolv.conf"),
     mkBonds(d),
     mkInterfaces(d),
     mkRootKeys(d),

@@ -44,7 +44,9 @@ let
     };
 
     build = installTimeNixos.config.system.build;
-  in pkgs.runCommand name {} ''
+  in pkgs.runCommand name {
+    passthru.system = system;
+  } ''
     mkdir $out
     ln -s ${build.netbootRamdisk}/initrd $out/initrd
     ln -s ${build.kernel}/${img} $out/${img}
@@ -153,28 +155,18 @@ let
   '';
 
 in rec {
-  all-x86-64 = pkgs.runCommand "nixos-all-x86-64" {}
-    ''
-      mkdir $out
-      ln -s ${type-0} $out/type-0
-      ln -s ${type-1} $out/type-1
-      ln -s ${type-2} $out/type-2
-      ln -s ${type-3} $out/type-3
-      ln -s ${type-s} $out/type-s
-    '';
-
-  type-0 = mkPXEInstaller {
-    name = "type-0";
+  t1-small-x86 = mkPXEInstaller {
+    name = "t1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-0/hardware.nix
+      ./instances/t1.small.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-0/installed.nix
+      ./instances/t1.small.x86/installed.nix
     ];
 
     partition = partitionLinuxWithSwap "/dev/sda";
@@ -190,18 +182,18 @@ in rec {
     '';
   };
 
-  type-1 = mkPXEInstaller {
-    name = "type-1";
+  c1-small-x86 = mkPXEInstaller {
+    name = "c1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-1/hardware.nix
+      ./instances/c1.small.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-1/installed.nix
+      ./instances/c1.small.x86/installed.nix
     ];
 
     partition = ''
@@ -225,23 +217,23 @@ in rec {
     '';
   };
 
-  type-2a = mkPXEInstaller {
-    name = "type-2a";
+  c1-large-arm = mkPXEInstaller {
+    name = "c1.large.arm";
     system = "aarch64-linux";
     img = "Image";
 
     installTimeConfigFiles = [
       ./base.nix
-      ./instances/type-2a/installer.nix
+      ./instances/c1.large.arm/installer.nix
     ];
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-2a/hardware.nix
+      ./instances/c1.large.arm/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-2a/installed.nix
+      ./instances/c1.large.arm/installed.nix
     ];
 
     partition = partitionLinuxWithBoot "/dev/sda";
@@ -258,18 +250,18 @@ in rec {
     '';
   };
 
-  type-2 = mkPXEInstaller {
-    name = "type-2";
+  m1-xlarge-x86 = mkPXEInstaller {
+    name = "m1.xlarge.x86";
     system = "x86_64-linux";
     img = "bzImage";
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-2/hardware.nix
+      ./instances/m1.xlarge.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-2/installed.nix
+      ./instances/m1.xlarge.x86/installed.nix
     ];
 
     partition = ''
@@ -287,18 +279,18 @@ in rec {
     '';
   };
 
-  type-3 = mkPXEInstaller {
-    name = "type-3";
+  c1-xlarge-x86 = mkPXEInstaller {
+    name = "c1.xlarge.x86";
     system = "x86_64-linux";
     img = "bzImage";
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-3/hardware.nix
+      ./instances/c1.xlarge.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-3/installed.nix
+      ./instances/c1.xlarge.x86/installed.nix
     ];
 
     partition = ''
@@ -322,27 +314,116 @@ in rec {
     '';
   };
 
-  type-s = mkPXEInstaller {
-    name = "type-s";
+  s1-large-x86 = mkPXEInstaller {
+    name = "s1.large.x86";
     system ="x86_64-linux";
     img = "bzImage";
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/type-s/hardware.nix
+      ./instances/s1.large.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/type-s/installed.nix
+      ./instances/s1.large.x86/installed.nix
     ];
 
     partition = ''
-      ${partitionLinuxWithBootSwap "/dev/sdo"}
+      ${partitionLinuxWithBootSwap "/dev/sda"}
     '';
 
     format = ''
-      mkswap -L swap /dev/sdo2
-      mkfs.ext4 -L nixos /dev/sdo3
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
+    '';
+
+    mount = ''
+      swapon -L swap
+      mount -L nixos /mnt
+    '';
+  };
+
+  c2-medium-x86 = mkPXEInstaller {
+    name = "c2.medium.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+
+    installTimeConfigFiles = [
+      ./base.nix
+      ./instances/c2.medium.x86/installer.nix
+    ];
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/c2.medium.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/c2.medium.x86/installed.nix
+    ];
+
+    partition = partitionLinuxWithBootSwap "/dev/sda";
+
+    format = ''
+      mkfs.vfat /dev/sda1
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
+    '';
+
+    mount = ''
+      swapon -L swap
+      mount -L nixos /mnt
+      mkdir -p /mnt/boot/efi
+      mount /dev/sda1 /mnt/boot/efi
+    '';
+  };
+
+  x1-small-x86 = mkPXEInstaller {
+    name = "x1.small.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/x1.small.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/x1.small.x86/installed.nix
+    ];
+
+    partition = partitionLinuxWithBootSwap "/dev/sda";
+
+    format = ''
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
+    '';
+
+    mount = ''
+      swapon -L swap
+      mount -L nixos /mnt
+    '';
+  };
+
+  m2-xlarge-x86 = mkPXEInstaller {
+    name = "m2.xlarge.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/m2.xlarge.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/m2.xlarge.x86/installed.nix
+    ];
+
+    partition = partitionLinuxWithBootSwap "/dev/sda";
+
+    format = ''
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
     '';
 
     mount = ''
