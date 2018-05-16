@@ -3,7 +3,7 @@
 with lib;
 
 let
-  install-tools = (import ./install-tools {});
+  install-tools = (import ./install-tools { inherit pkgs; });
   cfg = config.installer;
 in {
 
