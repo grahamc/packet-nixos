@@ -90,7 +90,6 @@ arm_kexec() {
 do_kexec() {
     udevadm settle
 
-
     sync
     sleep 1
     sync
