@@ -337,12 +337,12 @@ in rec {
     ];
 
     partition = ''
-      ${partitionLinuxWithBootSwap "/dev/sda"}
+      ${partitionLinuxWithBootSwap "/dev/disk/by-path/pci-0000:00:1f.2-ata-5"}
     '';
 
     format = ''
-      mkswap -L swap /dev/sda2
-      mkfs.ext4 -L nixos /dev/sda3
+      mkswap -L swap "/dev/disk/by-path/pci-0000:00:1f.2-ata-5-part2"
+      mkfs.ext4 -L nixos "/dev/disk/by-path/pci-0000:00:1f.2-ata-5-part3"
     '';
 
     mount = ''
