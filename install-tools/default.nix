@@ -37,9 +37,10 @@ in pkgs.stdenv.mkDerivation {
   name = "installtools";
   src = ./bin;
 
-  inherit (pkgs) coreutils utillinux e2fsprogs zfs;
+  inherit (pkgs) coreutils utillinux e2fsprogs zfs kexectools jq;
   inherit packetconfiggen python3;
   phonehomeconf = ./phone-home.nix;
+  kexecconfig = ./kexec-config.nix;
 
   buildPhase = ''
     substituteAllInPlace ./notify.py

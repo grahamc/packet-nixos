@@ -2,7 +2,7 @@
 
 set -eux
 
-PATH=@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@zfs@/bin:@out@/bin:/run/current-system/sw/bin/:$PATH
+PATH=@kexectools@/bin:@jq@/bin:@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@zfs@/bin:@out@/bin:/run/current-system/sw/bin/:$PATH
 
 pre_partition() {
     udevadm settle
@@ -70,10 +70,34 @@ do_install() {
 
     notify.py installed
     touch /mnt/etc/.packet-phone-home
+    arm_kexec
     delete_temporary_modules
 }
 
 do_reboot() {
     udevadm settle
+    # note: do_kexec depends upon do_reboot unloading
+    kexec --unload
     reboot
+}
+
+arm_kexec() {
+    nix-instantiate --json --eval @kexecconfig@ \
+        | jq -r . \
+        | bash -eux
+}
+
+do_kexec() {
+    udevadm settle
+
+
+    sync
+    sleep 1
+    sync
+    sleep 1
+    sync
+
+    # In case kexec failed to actually do the thing, fall back to a
+    # standard reboot.
+    kexec -e || do_reboot
 }

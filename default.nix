@@ -9,6 +9,7 @@ let
     , partition # Partition commands
     , format # formatting commands
     , mount # mount commands
+    , kexec ? false # skip the reboot, just kexec in
     }: let
 
     handjam = {
@@ -33,7 +34,7 @@ let
         ] ++ installTimeConfigFiles ++ configFiles ++ [
           {
             installer = {
-              inherit partition format mount;
+              inherit partition format mount kexec;
               type = "${name}-${system}";
               configFiles = configFiles ++ runTimeConfigFiles;
               runTimeNixOS = "${runTimeNixOS.system}";

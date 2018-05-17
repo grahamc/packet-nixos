@@ -20,6 +20,14 @@ in {
       type = types.path;
     };
 
+    kexec = mkOption {
+      description = ''
+        Don't do a full reboot, just load the new kernel and kexec it.
+      '';
+      default = false;
+      type = types.bool;
+    };
+
     configFiles = mkOption {
       description = "Config files to copy to the installed system";
       type = types.listOf types.path;
@@ -96,7 +104,7 @@ in {
 
         finalize_config
         do_install
-        do_reboot
+        ${if cfg.kexec then "do_kexec" else "do_reboot"}
       '';
       environment = {
         NIX_PATH = "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos/nixpkgs:nixos-config=/etc/nixos/configuration.nix:/nix/var/nix/profiles/per-user/root/channels";
