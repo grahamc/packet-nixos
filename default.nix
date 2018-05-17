@@ -161,6 +161,7 @@ in rec {
     name = "t1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -188,6 +189,7 @@ in rec {
     name = "c1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -223,6 +225,7 @@ in rec {
     name = "c1.large.arm";
     system = "aarch64-linux";
     img = "Image";
+    kexec = true;
 
     installTimeConfigFiles = [
       ./base.nix
@@ -256,6 +259,7 @@ in rec {
     name = "m1.xlarge.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -285,6 +289,7 @@ in rec {
     name = "c1.xlarge.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -320,6 +325,7 @@ in rec {
     name = "s1.large.x86";
     system ="x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -384,6 +390,7 @@ in rec {
     name = "x1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -411,6 +418,7 @@ in rec {
     name = "m2.xlarge.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
