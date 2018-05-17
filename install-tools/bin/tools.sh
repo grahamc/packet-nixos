@@ -37,11 +37,11 @@ finalize_config() {
     sed -i "s#./hardware-configuration.nix#./packet.nix#" /mnt/etc/nixos/configuration.nix
     rm /mnt/etc/nixos/hardware-configuration.nix
 
-    place_phone_home
+    place_temporary_modules
     update_includes_nix
 }
 
-place_phone_home() {
+place_temporary_modules() {
     cat @phonehomeconf@ \
         | sed -e "s#CURL_CALL#$(notify.py booted)#" \
         | cat > /mnt/etc/nixos/packet/phone-home.nix
@@ -49,7 +49,7 @@ place_phone_home() {
     update_includes_nix
 }
 
-delete_phone_home() {
+delete_temporary_modules() {
     rm /mnt/etc/nixos/packet/phone-home.nix
     update_includes_nix
 }
@@ -70,7 +70,7 @@ do_install() {
 
     notify.py installed
     touch /mnt/etc/.packet-phone-home
-    delete_phone_home
+    delete_temporary_modules
 }
 
 do_reboot() {
