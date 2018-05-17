@@ -46,6 +46,7 @@ let
     build = installTimeNixos.config.system.build;
   in pkgs.runCommand name {
     passthru.system = system;
+    passthru.class = name;
   } ''
     mkdir $out
     ln -s ${build.netbootRamdisk}/initrd $out/initrd

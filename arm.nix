@@ -4,7 +4,10 @@ let
   filtered = lib.filterAttrs
     (name: sys: sys.system == "aarch64-linux")
     (import ./default.nix);
-  ln = lib.mapAttrsToList (n: v: "ln -s ${v} $out/${n}") filtered;
+   ln = lib.mapAttrsToList (n: v: ''
+     ln -s ${v} $out/${n}
+     ln -s ${v} $out/${v.class}
+   '') filtered;
 in pkgs.runCommand "arm-pxe-images" {} ''
   mkdir -p $out
   ${lib.concatStringsSep "\n" ln}
