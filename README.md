@@ -1,4 +1,5 @@
 # NixOS <3 Packet.net
+## The Official NixOS install images for Packet.net
 ## Boot Packet.net bare metal with iPXE
 
 Creates an iPXE-based NixOS installer. Has no hard-coded credentials,
