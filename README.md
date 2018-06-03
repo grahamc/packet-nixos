@@ -32,6 +32,13 @@ $ ./all.sh
 
 It will output them all to `./nixos-ipxe-<type>/`
 
+If you pass `dumpkeys` in the commandline arguments, it will dump the
+user-defined SSH keys to the root's account inside the netboot
+environment, for installer debugging.
+
+
+
+
 ## Customization
 
 Check out ./default.nix for how the partitioning and formatting are
