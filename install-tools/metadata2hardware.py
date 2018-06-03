@@ -24,7 +24,8 @@ def mkRootPassword(path):
 def mkBonds(blob):
     cfg = """
       networking.bonds.bond0 = {{
-        driverOptions.mode = "{mode}";
+        driverOptions = {{bonding_options}        };
+
         interfaces = [
           {interfaces}
         ];
@@ -32,8 +33,19 @@ def mkBonds(blob):
     """
     interfacePart = '"{}"'
 
-    modes = {4: "802.3ad", 5: "balance-tlb"}
-    mode = modes[blob['network']['bonding']['mode']]
+    mode_to_options = {4: """
+          mode = "802.3ad";
+          xmit_hash_policy = "layer3+4";
+          lacp_rate = "fast";
+          downdelay = "200";
+          miimon = "100";
+          updelay = "200";
+""",
+             5: """"
+          mode = "balance-tlb";
+"""
+    }
+    mode_options = mode_to_options[blob['network']['bonding']['mode']]
     macToName = {open(f).read().strip(): f.split('/')[4] for f in glob('/sys/class/net/*/address')}
 
     interfaces = [
@@ -41,7 +53,7 @@ def mkBonds(blob):
         for interface in blob['network']['interfaces']
     ]
 
-    return cfg.format(mode=mode, interfaces=" ".join(interfaces))
+    return cfg.format(bonding_options=mode_options, interfaces=" ".join(interfaces))
 
 
 def mkNetworking(blob, path):
