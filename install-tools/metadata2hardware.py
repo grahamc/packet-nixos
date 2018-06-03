@@ -24,7 +24,9 @@ def mkRootPassword(path):
 def mkBonds(blob):
     cfg = """
       networking.bonds.bond0 = {{
-        driverOptions = {{bonding_options}        };
+        driverOptions = {{
+{bonding_options}
+}};
 
         interfaces = [
           {interfaces}
@@ -41,7 +43,7 @@ def mkBonds(blob):
           miimon = "100";
           updelay = "200";
 """,
-             5: """"
+             5: """
           mode = "balance-tlb";
 """
     }
