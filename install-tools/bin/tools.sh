@@ -64,9 +64,25 @@ update_includes_nix() {
     popd
 }
 
+apply_user_data() {
+    curl -o /mnt/etc/nixos/packet/userdata.nix \
+         https://metadata.packet.net/userdata
+    update_includes_nix
+}
+
+delete_user_data() {
+    rm /mnt/etc/nixos/packet/userdata.nix
+    update_includes_nix
+}
+
 do_install() {
     nixos-install < /dev/null
     udevadm settle
+
+    apply_user_data
+    if ! nixos-install < /dev/null; then
+        delete_user_data
+    fi
 
     notify.py installed
     touch /mnt/etc/.packet-phone-home
@@ -82,9 +98,11 @@ do_reboot() {
 }
 
 arm_kexec() {
-    nix-instantiate --json --eval @kexecconfig@ \
-        | jq -r . \
-        | bash -eux
+    if nix-instantiate --json --eval @kexecconfig@ > /dev/null 2>&1; then
+        nix-instantiate --json --eval @kexecconfig@ \
+            | jq -r . \
+            | bash -eux
+    fi
 }
 
 do_kexec() {
