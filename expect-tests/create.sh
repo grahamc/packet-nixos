@@ -6,6 +6,9 @@ set -o pipefail
 
 . ./config.sh
 
+#,
+#        "userdata": "#!nix\n{ pkgs, ... }: { environment.systemPackages = [ pkgs.hello ]; "
+
 function make_server() {
     REGION=$1
     PLAN="$2"
