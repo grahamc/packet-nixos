@@ -22,6 +22,8 @@ function make_server() {
         "ipxe_script_url": "'"$URL"'",
         "operating_system": "7516833e-1b77-4611-93e9-d48225ca8b3c",
         "billing_cycle": "hourly",
+	"spot_instance": true,
+	"spot_price_max": '1.00',
         "userdata": "",
         "locked": "false",
         "project_ssh_keys": [
