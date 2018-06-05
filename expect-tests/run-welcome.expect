@@ -12,3 +12,9 @@ expect {
               puts ">>>> BOOTED"
        }
 }
+
+expect {
+       "root@install-environment" {
+              send "journalctl -f\n"
+       }
+}

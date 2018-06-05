@@ -58,7 +58,7 @@ in {
 
 
   config = {
-    networking.hostName = "ipxe-${cfg.type}";
+    networking.hostName = "install-environment";
 
     systemd.services.sshd.wantedBy = mkForce [ "multi-user.target" ];
 
