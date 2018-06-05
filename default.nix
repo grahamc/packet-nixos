@@ -227,7 +227,7 @@ in rec {
     name = "c1.large.arm";
     system = "aarch64-linux";
     img = "Image";
-    kexec = true;
+    kexec = false; #??? Fails to reboot!
 
     installTimeConfigFiles = [
       ./base.nix
