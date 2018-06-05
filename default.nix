@@ -10,6 +10,7 @@ let
     , format # formatting commands
     , mount # mount commands
     , kexec ? false # skip the reboot, just kexec in
+    , enable ? true
     }: let
 
     handjam = {
@@ -45,7 +46,7 @@ let
     };
 
     build = installTimeNixos.config.system.build;
-  in pkgs.runCommand name {
+  in if enable then pkgs.runCommand name {
     passthru.system = system;
     passthru.class = name;
   } ''
@@ -53,7 +54,7 @@ let
     ln -s ${build.netbootRamdisk}/initrd $out/initrd
     ln -s ${build.kernel}/${img} $out/${img}
     ln -s ${build.netbootIpxeScript}/netboot.ipxe $out/netboot.ipxe
-  '';
+  '' else { system = ""; };
 
   partitionOneLinux = disk: ''
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${disk}
@@ -222,6 +223,7 @@ in rec {
   };
 
   c1-large-arm = mkPXEInstaller {
+    enable = false;
     name = "c1.large.arm";
     system = "aarch64-linux";
     img = "Image";
