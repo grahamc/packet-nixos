@@ -45,6 +45,10 @@ def mkBonds(blob):
 """,
              5: """
           mode = "balance-tlb";
+          xmit_hash_policy = "layer3+4";
+          downdelay = "200";
+          updelay = "200";
+          miimon = "100";
 """
     }
     mode_options = mode_to_options[blob['network']['bonding']['mode']]
