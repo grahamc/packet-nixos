@@ -46,7 +46,7 @@ let
     };
 
     build = installTimeNixos.config.system.build;
-  in if enable then pkgs.runCommand name {
+  in if enable then installTimeNixos.pkgs.runCommand name {
     passthru.system = system;
     passthru.class = name;
   } ''

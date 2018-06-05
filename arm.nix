@@ -1,5 +1,5 @@
 let
-  pkgs = import <nixpkgs> {};
+  pkgs = import <nixpkgs> { system = "aarch64-linux"; };
   lib = pkgs.lib;
   filtered = lib.filterAttrs
     (name: sys: sys.system == "aarch64-linux")
