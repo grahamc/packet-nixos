@@ -5,6 +5,11 @@
       systemd-boot.enable = lib.mkForce false;
       grub = {
         enable = true;
+        extraConfig = ''
+          serial
+          terminal_input serial console
+          terminal_output serial console
+        '';
       };
       efi = {
         efiSysMountPoint = "/boot/efi";
