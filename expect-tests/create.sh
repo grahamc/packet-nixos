@@ -45,7 +45,7 @@ function make_server() {
         "operating_system": "7516833e-1b77-4611-93e9-d48225ca8b3c",
         "billing_cycle": "hourly",
 	"spot_instance": true,
-	"spot_price_max": '1.00',
+	"spot_price_max": '5.00',
         "userdata": "",
         "locked": "false",
         "project_ssh_keys": [

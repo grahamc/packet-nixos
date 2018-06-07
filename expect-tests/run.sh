@@ -7,15 +7,15 @@ set -eux
 
 . ./config.sh
 
-uuid=$1
-region=$2
+#uuid=$1
+#region=$2
 ipv4_public=$3
-ipv4_private=$5
-ipv6_public=$4
+#ipv4_private=$5
+#ipv6_public=$4
 
 target_ipv4_public=$TEST_IPV4_PUBLIC
 target_ipv6_public=$TEST_IPV6_PUBLIC
-target_ipv4_private=$TEST_IPV4_PRIVATE
+#target_ipv4_private=$TEST_IPV4_PRIVATE
 
 sshopts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
@@ -56,7 +56,7 @@ expect -d ./journal.expect "$1" "$2"
 expect -d ./run-welcome.expect "$1" "$2"
 
 check_network
-
+#ssh $sshopts root@"$ipv4_public" hello
 ssh $sshopts root@"$ipv4_public" nixos-rebuild boot
 ssh $sshopts root@"$ipv4_public" reboot || true
 
