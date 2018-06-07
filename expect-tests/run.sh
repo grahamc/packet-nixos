@@ -50,7 +50,7 @@ check_network() {
 }
 
 # Install-time boot
-expect -d ./run-welcome.expect "$1" "$2"
+expect -d ./journal.expect "$1" "$2"
 
 # Boot to actual install
 expect -d ./run-welcome.expect "$1" "$2"

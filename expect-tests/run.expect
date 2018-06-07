@@ -3,9 +3,12 @@ set region [lindex $argv 1];
 
 spawn ./console.sh "$uuid" "$region"
 
-set timeout -1
+set timeout 1200
 
 send "\n"
+
+set UP \x1B\[A;
+set DOWN \x1B\[B;
 
 expect {
        "NixOS - All configurations" {
@@ -13,8 +16,45 @@ expect {
        }
 }
 
+set timeout 1
+while true {
+      expect {
+              "NixOS" {
+                      puts "cool"
+                      break
+              }
+              timeout {
+                      send -- \x1B\[A;
+                      send -- \x1B\[B;
+              }
+      }
+}
+
+send "\r\n"
+
+while true {
+      expect {
+              "Configuration 2" {
+                      puts ">>>> CONFIGURATION 2 LOOKS GOOD"
+                      break
+              }
+              timeout {
+                      send -- \x1B\[A;
+                      send -- \x1B\[B;
+              }
+      }
+}
+
+send -- \x1B\[B;
+send "\r\n"
+
+set timeout 1200
+
 expect {
        "Welcome to NixOS" {
+              puts ">>>> BOOTED"
+       }
+       "test-instance login:" {
               puts ">>>> BOOTED"
        }
 }
