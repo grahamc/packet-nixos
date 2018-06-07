@@ -7,6 +7,8 @@
         efiSupport = true;
         device = "nodev";
         efiInstallAsRemovable = true;
+        font = null;
+        splashImage = null;
       };
     };
 
@@ -16,7 +18,6 @@
 
     kernelParams = [
       "cma=0M" "biosdevname=0" "net.ifnames=0" "console=ttyAMA0"
-#      "slub_debug=FZP"
     ];
 
     kernelPackages = pkgs.linuxPackages_4_14;
@@ -29,14 +30,6 @@
     system = "aarch64-linux";
     config = {
       allowUnfree = true;
-      packageOverrides = pkgs:
-      { linux_4_14 = pkgs.linux_4_14.override {
-          extraConfig =
-            ''
-              KASAN y
-            '';
-        };
-      };
     };
   };
 }

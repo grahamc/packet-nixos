@@ -223,7 +223,7 @@ in rec {
   };
 
   c1-large-arm = mkPXEInstaller {
-    enable = false;
+    enable = true;
     name = "c1.large.arm";
     system = "aarch64-linux";
     img = "Image";
