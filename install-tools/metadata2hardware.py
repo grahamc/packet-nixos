@@ -114,7 +114,7 @@ def mkNetworking(blob, path):
 def mkInterfaces(blob):
     cfg = """
       networking.interfaces.bond0 = {{
-        useDHCP = true;
+        useDHCP = false;
 
         ipv4 = {{
           routes = [

@@ -35,3 +35,5 @@ for i in $(seq 1 "$started"); do
     echo "$?"
 done
 echo "done"
+
+tail -n3 ./testlog.*

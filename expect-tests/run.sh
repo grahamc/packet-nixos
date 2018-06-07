@@ -55,6 +55,8 @@ expect -d ./journal.expect "$1" "$2"
 # Boot to actual install
 expect -d ./run-welcome.expect "$1" "$2"
 
+echo "INSTALL COMPLETE AT $(date)"
+
 check_network
 #ssh $sshopts root@"$ipv4_public" hello
 ssh $sshopts root@"$ipv4_public" nixos-rebuild boot
