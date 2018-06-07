@@ -30,7 +30,7 @@ cd $out
 for f in $(find -L . -name 'netboot.ipxe' -o -name '*.bz2' | sort -h); do
   printf '<li><a href="%s">%s</a></li>\n' \
     $f \
-    $(basename $(dirname $f));
+    $f;
 done > $out/index.html
 
 ''
