@@ -9,6 +9,28 @@ set -o pipefail
 #,
 #        "userdata": "#!nix\n{ pkgs, ... }: { environment.systemPackages = [ pkgs.hello ]; "
 
+function get_regions() {
+     class="$1"
+     curl --fail \
+          --header 'Accept: application/json' \
+          --header "X-Auth-Token: $token" \
+          'https://api.packet.net/capacity?legacy=exclude' \
+       | jq -r '.capacity
+                | to_entries[]
+                | select((.value | has("'"$class"'"))
+                         and .value."'"$class"'".level != "unavailable")
+                | .key'
+}
+
+function get_region() {
+     regions=$(get_regions "$1")
+     if echo "$regions" | grep -q "ewr1"; then
+       echo ewr1
+     else
+       echo "$regions" | head -n1
+     fi
+}
+
 function make_server() {
     REGION=$1
     PLAN="$2"
@@ -36,6 +58,7 @@ function make_server() {
     ' --header 'Accept: application/json' \
          --header 'Content-Type: application/json' \
          --header "X-Auth-Token: $token" \
+         --fail \
          "https://api.packet.net/projects/$PROJECT/devices" \
          | tee /dev/stderr \
          | jq -r .href
@@ -61,21 +84,15 @@ function delete() {
     | tee /dev/stderr
 }
 
-region=ewr1
-name=c2.medium.x86
-name=c1.small.x86
-name=c1.xlarge.x86
-name=m1.xlarge.x86
-name=s1.large.x86
-name=t1.small.x86
-name=x1.small.x86 region=atl1
-name=m2.xlarge.x86 region=ams1
-url=$(make_server $region $name "$IPXE_ROOT/$name/netboot.ipxe")
+
+name="$1"
+region=$(get_region "$name")
+url=$(make_server "$region" "$name" "$IPXE_ROOT/$name/netboot.ipxe")
 
 while ! [ "$(fetch_info "$url" | wc -l)" -eq 5 ]; do sleep 1; done
 
 fetch_info "$url" | xargs ./run.sh
 
-sleep 60
+sleep 10
 
 delete "$url"
