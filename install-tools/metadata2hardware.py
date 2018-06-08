@@ -52,7 +52,11 @@ def mkBonds(blob):
 """
     }
     mode_options = mode_to_options[blob['network']['bonding']['mode']]
-    macToName = {open(f).read().strip(): f.split('/')[4] for f in glob('/sys/class/net/*/address')}
+    macToName = {
+            open(f).read().strip(): f.split('/')[4]
+            for f in glob('/sys/class/net/*/address')
+            if f.split('/')[4] != 'bond0'
+            }
 
     interfaces = [
         interfacePart.format(macToName[interface['mac']])
