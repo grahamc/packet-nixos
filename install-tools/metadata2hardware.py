@@ -26,7 +26,7 @@ def mkBonds(blob):
       networking.bonds.bond0 = {{
         driverOptions = {{
 {bonding_options}
-}};
+        }};
 
         interfaces = [
           {interfaces}
@@ -59,7 +59,7 @@ def mkBonds(blob):
         for interface in blob['network']['interfaces']
     ]
 
-    return cfg.format(bonding_options=mode_options, interfaces=" ".join(interfaces))
+    return cfg.format(bonding_options=mode_options.strip("\n"), interfaces=" ".join(interfaces))
 
 
 def mkNetworking(blob, path):
