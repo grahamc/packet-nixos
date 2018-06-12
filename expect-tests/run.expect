@@ -17,6 +17,7 @@ expect {
 }
 
 set timeout 1
+set attempts 0
 while true {
       expect {
               "NixOS" {
@@ -24,14 +25,20 @@ while true {
                       break
               }
               timeout {
+                      if attempts > 600 {
+                          puts "failed to find the NixOS bootloader"
+                          exit 1
+                      }
                       send -- \x1B\[A;
                       send -- \x1B\[B;
+                      incr attempts
               }
       }
 }
 
 send "\r\n"
 
+set attempts 0
 while true {
       expect {
               "Configuration 2" {
@@ -39,8 +46,13 @@ while true {
                       break
               }
               timeout {
+                      if attempts > 600 {
+                          puts "failed to find the Configuration 2 in the bootloader"
+                          exit 1
+                      }
                       send -- \x1B\[A;
                       send -- \x1B\[B;
+                      incr attempts
               }
       }
 }

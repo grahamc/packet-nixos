@@ -70,6 +70,7 @@ function fetch_info() {
     curl  --header 'Accept: application/json' \
          --header 'Content-Type: application/json' \
          --header "X-Auth-Token: $token" \
+         --fail \
          "https://api.packet.net/$URL" \
          | tee /dev/stderr \
          | jq -r .id,.facility.code,.ip_addresses[].address
