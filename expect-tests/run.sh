@@ -7,8 +7,8 @@ set -eux
 
 . ./config.sh
 
-#uuid=$1
-#region=$2
+uuid=$1
+region=$2
 ipv4_public=$3
 #ipv4_private=$5
 #ipv6_public=$4
@@ -50,10 +50,10 @@ check_network() {
 }
 
 # Install-time boot
-expect -d ./journal.expect "$1" "$2"
+expect -d ./journal.expect "$uuid" "$region"
 
 # Boot to actual install
-expect -d ./run-welcome.expect "$1" "$2"
+expect -d ./run-welcome.expect "$uuid" "$region"
 
 echo "INSTALL COMPLETE AT $(date)"
 
@@ -63,6 +63,6 @@ ssh $sshopts root@"$ipv4_public" nixos-rebuild boot
 ssh $sshopts root@"$ipv4_public" reboot || true
 
 
-expect -d ./run.expect "$1" "$2"
+expect -d ./run.expect "$uuid" "$region"
 
 check_network
