@@ -8,13 +8,18 @@ let
 
     python = python3;
 
+    buildInputs = [ pkgs.python3Packages.flake8 pkgs.makeWrapper];
+
     phases = [ "installPhase" ];
 
     installPhase = ''
+      flake8 $src
       mkdir -p $out/bin
       echo "#!${python}/bin/python3" > $out/bin/packet-config-gen
       cat $src >> $out/bin/packet-config-gen
       chmod +x $out/bin/packet-config-gen
+      wrapProgram $out/bin/packet-config-gen \
+        --prefix PATH : "${pkgs.ethtool}/bin/"
     '';
   };
 
