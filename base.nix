@@ -60,7 +60,7 @@ in {
   config = {
     networking.hostName = "install-environment";
 
-    systemd.services.sshd.wantedBy = mkForce [ "multi-user.target" ];
+    # systemd.services.sshd.wantedBy = mkForce [ "multi-user.target" ];
 
     systemd.services.dumpkeys = {
       wantedBy = [ "multi-user.target" ];
@@ -71,6 +71,7 @@ in {
           touch /root/.ssh/authorized_keys
           chmod 0644 /root/.ssh/authorized_keys
           ${install-tools}/bin/dump-keys.py > /root/.ssh/authorized_keys
+          systemctl start sshd
         fi
       '';
     };
