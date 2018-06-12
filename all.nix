@@ -10,11 +10,12 @@ let
   allWithTarball = pkgs.runCommand "all-pxe-images-with-tarball" {} ''
     now=$(date '+%Y-%m-%d--%H-%M-%S')
     cp -r ${all} "./nixos-netboot-images-$now"
+    chmod u+w "./nixos-netboot-images-$now"
     (
       cd "./nixos-netboot-images-$now"
       sha1sum ./*/* > sha1sums
     )
-    chmod u+w "./nixos-netboot-images-$now"
+
     tar --create \
         --verbose \
         --bzip2 \
