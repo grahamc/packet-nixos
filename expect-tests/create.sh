@@ -87,7 +87,13 @@ function delete() {
 
 
 name="$1"
-region=$(get_region "$name")
+if [ "${2:-}" = "" ]; then
+  region=$(get_region "$name")
+else
+  region="$2"
+fi
+
+
 url=$(make_server "$region" "$name" "$IPXE_ROOT/$name/netboot.ipxe")
 
 while ! [ "$(fetch_info "$url" | wc -l)" -eq 5 ]; do sleep 1; done
