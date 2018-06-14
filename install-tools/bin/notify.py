@@ -7,6 +7,10 @@ import os
 import sys
 
 
+def cb_connected(url, instance_id):
+    requests.put(url, json={"type": "provisioning.104", "body": "Connected to magic install system"})
+    print("Announced connected")
+
 def cb_partitioned(url, instance_id):
     requests.put(url, json={"type": "provisioning.105", "body": "Server partitions created"})
     print("Announced partitions")
@@ -27,6 +31,7 @@ def cb_booted(url, instance_id):
 
 
 cbs = {
+    "connected": cb_connected,
     "partitioned": cb_partitioned,
     "installed": cb_installed,
     "booted": cb_booted,

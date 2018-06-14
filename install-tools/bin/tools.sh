@@ -5,6 +5,7 @@ set -eux
 PATH=@kexectools@/bin:@jq@/bin:@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@zfs@/bin:@out@/bin:/run/current-system/sw/bin/:$PATH
 
 pre_partition() {
+    notify.py connected
     udevadm settle
 }
 
