@@ -58,6 +58,7 @@ def mkBonds(blob):
     interfaces = [
         interfacePart.format(macToName[interface['mac']])
         for interface in blob['network']['interfaces']
+        if interface['bond'] == 'bond0'
     ]
 
     return cfg.format(bonding_options=mode_options.strip("\n"),
