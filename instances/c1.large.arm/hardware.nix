@@ -7,8 +7,6 @@
         efiSupport = true;
         device = "nodev";
         efiInstallAsRemovable = true;
-        font = null;
-        splashImage = null;
       };
     };
 

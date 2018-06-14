@@ -5,6 +5,8 @@
       systemd-boot.enable = lib.mkForce false;
       grub = {
         enable = true;
+        font = null;
+        splashImage = null;
         extraConfig = ''
           serial
           terminal_input serial console
