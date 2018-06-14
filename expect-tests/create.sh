@@ -35,6 +35,7 @@ function make_server() {
     REGION=$1
     PLAN="$2"
     URL="$3"
+    terminate=$(TZ="UTC" date --date='+2 hours' +'%Y-%m-%dT%H:%M:%S.000Z')
     set -x
     curl -v --data '{
         "facility": "'"$REGION"'",
@@ -46,6 +47,7 @@ function make_server() {
         "billing_cycle": "hourly",
 	"spot_instance": true,
 	"spot_price_max": '5.00',
+        "termination_time": "'"${terminate}"'",
         "userdata": "",
         "locked": "false",
         "project_ssh_keys": [
