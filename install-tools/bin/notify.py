@@ -5,7 +5,7 @@ import json
 import requests
 import os
 import sys
-
+import urllib.parse
 
 def cb_connected(url, instance_id):
     requests.put(url, json={"type": "provisioning.104", "body": "Connected to magic install system"})
@@ -29,9 +29,15 @@ def cb_booted(url, instance_id):
     print("curl -H 'Content-Type: application/json' -d'{}' {}".format(
         '{{"instance_id": "{}"}}'.format(instance_id), url))
 
+def cb_logger_cmd(url, instance_id):
+    print("logger -n '{}' -P 514 -t '{}'".format(
+        urllib.parse.urlparse(url).netloc,
+        instance_id
+        ))
 
 cbs = {
     "connected": cb_connected,
+    "logger_cmd": cb_logger_cmd,
     "partitioned": cb_partitioned,
     "installed": cb_installed,
     "booted": cb_booted,

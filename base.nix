@@ -83,6 +83,8 @@ in {
         # ${cfg.runTimeNixOS} # Force realization & config validation
         . ${install-tools}/bin/tools.sh
 
+        initialize
+
         pre_partition
 
         ${cfg.partition}

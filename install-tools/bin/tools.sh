@@ -4,8 +4,14 @@ set -eux
 
 PATH=@kexectools@/bin:@jq@/bin:@packetconfiggen@/bin:@coreutils@/bin:@utillinux@/bin:@e2fsprogs@/bin:@zfs@/bin:@out@/bin:/run/current-system/sw/bin/:$PATH
 
-pre_partition() {
+initialize() {
     notify.py connected
+    exec 3>&1
+    exec 2> >(tee /proc/self/fd/3 | tee /dev/console | $(notify.py logger_cmd))
+    exec 1>&2
+}
+
+pre_partition() {
     udevadm settle
 }
 
