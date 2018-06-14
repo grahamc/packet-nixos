@@ -10,6 +10,12 @@ set -eux
 uuid=$1
 region=$2
 ipv4_public=$3
+
+expect -d ./test.expect "$uuid" "$region" "$ipv4_public"
+
+exit 0
+
+
 #ipv4_private=$5
 #ipv6_public=$4
 
