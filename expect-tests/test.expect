@@ -17,26 +17,8 @@ expect {
        }
 }
 
-if true {
-    set timeout 1
-    while true {
-        expect {
-            -i $console "journalctl -f" {
-                puts "OK COOL"
-                break
-            }
-            timeout {
-                send -i $console "\n"
-                send -i $console "journalctl -f\n"
-            }
-        }
-    }
-}
-
 ############################### run-welcome.expect
 set timeout 1200
-
-send -i $console "\n"
 
 expect {
        -i $console "Welcome to NixOS" {
