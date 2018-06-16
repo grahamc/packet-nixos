@@ -1,6 +1,5 @@
 let
-  pkgs = import <nixpkgs> {};
-  lib = pkgs.lib;
+  pkgs = import ./nix;
   filtered = import ./default.nix;
 in pkgs.writeText "pipeline.yml"
   (builtins.toJSON {
