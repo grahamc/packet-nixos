@@ -6,7 +6,6 @@ in pkgs.writeText "pipeline.yml"
     steps = (builtins.map
       (x: {
         command = ''
-          export NIX_PATH=nixpkgs=${pkgs.path}
           cd ./expect-tests
           ./create.sh ${x.class}
         '';
