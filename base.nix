@@ -52,11 +52,6 @@ in {
     };
   };
 
-  imports = [
-    "${pkgs.path}/nixos/modules/installer/netboot/netboot-minimal.nix"
-  ];
-
-
   config = {
     networking.hostName = "install-environment";
 

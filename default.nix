@@ -3,7 +3,7 @@ let
   mkNixos = import "${pkgs.path}/nixos";
 
   mkPXEInstaller = { name, system, img
-    , installTimeConfigFiles ? [ ./base.nix ]  # Used only during install time
+    , installTimeConfigFiles ? [ ]  # Used only during install time
     , runTimeConfigFiles # Used only after installation
     , configFiles  # Used during and after install time
     , partition # Partition commands
@@ -30,6 +30,7 @@ let
       inherit system;
       configuration = {
         imports = [
+          ./base.nix
           "${pkgs.path}/nixos/modules/installer/netboot/netboot-minimal.nix"
           handjam
         ] ++ installTimeConfigFiles ++ configFiles ++ [
@@ -230,7 +231,6 @@ in rec {
     kexec = false; #??? Fails to reboot!
 
     installTimeConfigFiles = [
-      ./base.nix
       ./instances/c1.large.arm/installer.nix
     ];
 
@@ -359,7 +359,6 @@ in rec {
     img = "bzImage";
 
     installTimeConfigFiles = [
-      ./base.nix
       ./instances/c2.medium.x86/installer.nix
     ];
 
