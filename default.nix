@@ -1,6 +1,6 @@
 let
-  pkgs = import <nixpkgs> {};
-  mkNixos = import <nixpkgs/nixos>;
+  pkgs = import ./nix {};
+  mkNixos = import "${pkgs.path}/nixos";
 
   mkPXEInstaller = { name, system, img
     , installTimeConfigFiles ? [ ./base.nix ]  # Used only during install time
@@ -30,7 +30,7 @@ let
       inherit system;
       configuration = {
         imports = [
-          <nixpkgs/nixos/modules/installer/netboot/netboot-minimal.nix>
+          "${pkgs.path}/nixos/modules/installer/netboot/netboot-minimal.nix"
           handjam
         ] ++ installTimeConfigFiles ++ configFiles ++ [
           {

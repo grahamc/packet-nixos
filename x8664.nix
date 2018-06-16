@@ -1,5 +1,5 @@
 let
-  pkgs = import <nixpkgs> {};
+  pkgs = import ./nix {};
   lib = pkgs.lib;
   filtered = lib.filterAttrs
     (name: sys: sys.system == "x86_64-linux")

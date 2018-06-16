@@ -53,7 +53,7 @@ in {
   };
 
   imports = [
-    <nixpkgs/nixos/modules/installer/netboot/netboot-minimal.nix>
+    "${pkgs.path}/nixos/modules/installer/netboot/netboot-minimal.nix"
   ];
 
 
