@@ -3,7 +3,7 @@
 
 echo hi
 
-set -eux
+set -eu
 
 . ./config.sh
 

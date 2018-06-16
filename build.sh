@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -eux
+set -eu
 set -o pipefail
 
 . ./expect-tests/config.sh
@@ -18,7 +18,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-set -eux
+set -eu
 
 if true; then
     ssh $SSHOPTS "$BUILD_HOST_ARM" true

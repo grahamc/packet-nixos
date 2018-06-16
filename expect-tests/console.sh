@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ux
+set -u
 
 UUID=$1
 REGION=$2

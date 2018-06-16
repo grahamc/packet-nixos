@@ -1,7 +1,7 @@
 #!/usr/bin/env nix-shell
 #!nix-shell -p curl -p jq -i bash
 
-set -eux
+set -eu
 set -o pipefail
 
 . ./config.sh
@@ -36,7 +36,11 @@ function make_server() {
     PLAN="$2"
     URL="$3"
     terminate=$(TZ=UTC date --date='+1 hour' --iso-8601=seconds)
-    set -x
+
+    # "ipxe_script_url": "'"$URL"'",
+    # "operating_system": "7516833e-1b77-4611-93e9-d48225ca8b3c",
+    #18.03:
+    # "operating_system": "97025afd-97d8-4459-bdb6-d3daa98ea162",
     curl -v --data '{
         "facility": "'"$REGION"'",
         "plan": "'"$PLAN"'",
@@ -68,7 +72,6 @@ function make_server() {
 
 function fetch_info() {
     URL="$1"
-    set -x
     curl  --header 'Accept: application/json' \
          --header 'Content-Type: application/json' \
          --header "X-Auth-Token: $token" \
