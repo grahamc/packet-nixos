@@ -246,14 +246,14 @@ in rec {
     partition = partitionLinuxWithBoot "/dev/sda";
 
     format = ''
-      mkfs.vfat /dev/sda1
+      mkfs.vfat -n boot /dev/sda1
       mkfs.ext4 -L nixos /dev/sda2
     '';
 
     mount = ''
       mount /dev/disk/by-label/nixos /mnt
       mkdir -p /mnt/boot/efi
-      mount /dev/sda1 /mnt/boot/efi
+      mount /dev/disk/by-label/boot /mnt/boot/efi
     '';
   };
 

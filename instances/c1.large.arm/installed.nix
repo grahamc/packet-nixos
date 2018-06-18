@@ -22,11 +22,11 @@
 
   fileSystems = {
     "/" = {
-      device = "/dev/sda2";
+      label = "nixos";
       fsType = "ext4";
     };
     "/boot/efi" = {
-      device = "/dev/sda1";
+      label = "boot";
       fsType = "vfat";
     };
   };
