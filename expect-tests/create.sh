@@ -9,45 +9,21 @@ set -o pipefail
 #,
 #        "userdata": "#!nix\n{ pkgs, ... }: { environment.systemPackages = [ pkgs.hello ]; "
 
-function get_regions() {
-     class="$1"
-     curl --fail \
-          --header 'Accept: application/json' \
-          --header "X-Auth-Token: $token" \
-          'https://api.packet.net/capacity?legacy=exclude' \
-       | jq -r '.capacity
-                | to_entries[]
-                | select((.value | has("'"$class"'"))
-                         and .value."'"$class"'".level != "unavailable")
-                | .key'
-}
-
-function get_region() {
-     regions=$(get_regions "$1")
-     if echo "$regions" | grep -q "ewr1"; then
-       echo ewr1
-     else
-       echo "$regions" | head -n1
-     fi
-}
-
 function make_server() {
-    REGION=$1
-    PLAN="$2"
-    URL="$3"
+    PLAN="$1"
+    URL="$2"
     terminate=$(TZ=UTC date --date='+1 hour' --iso-8601=seconds)
 
     # "ipxe_script_url": "'"$URL"'",
     # "operating_system": "7516833e-1b77-4611-93e9-d48225ca8b3c",
     #18.03:
-    # "operating_system": "97025afd-97d8-4459-bdb6-d3daa98ea162",
+    #
     curl -v --data '{
-        "facility": "'"$REGION"'",
+        "facility": [ "ewr1", "iad1", "atl1", "any" ],
         "plan": "'"$PLAN"'",
         "hostname": "test-instance",
         "description": "Test instance for $TYPE",
-        "ipxe_script_url": "'"$URL"'",
-        "operating_system": "7516833e-1b77-4611-93e9-d48225ca8b3c",
+        "operating_system": "97025afd-97d8-4459-bdb6-d3daa98ea162",
         "billing_cycle": "hourly",
 	"spot_instance": true,
 	"spot_price_max": '5.00',
@@ -92,11 +68,6 @@ function delete() {
 
 
 name="$1"
-if [ "${2:-}" = "" ]; then
-  region=$(get_region "$name")
-else
-  region="$2"
-fi
 
 if [ "$name" == "c1.large.arm.xda" ]; then
    pxe_url="$IPXE_ROOT/c1.large.arm/netboot.ipxe"
@@ -106,7 +77,7 @@ else
    pxe_url="$IPXE_ROOT/$name/netboot.ipxe"
 fi
 
-url=$(make_server "$region" "$name" "$pxe_url")
+url=$(make_server "$name" "$pxe_url")
 
 cleanup() {
           delete "$url"

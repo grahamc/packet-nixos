@@ -2,6 +2,7 @@
 
 started=0
 check() {
+    sleep 1
     class="$1"
     started=$((started + 1))
     echo "Started $class, writing to ./testlog.$class"
