@@ -1,7 +1,7 @@
 { ... }:
 {
   boot.loader.grub.devices = [
-    "/dev/sda"
+    "/dev/sda" # !!! FIX
   ];
   boot.loader.grub.extraConfig = ''
     serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1
