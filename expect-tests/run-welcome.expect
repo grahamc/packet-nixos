@@ -1,0 +1,17 @@
+set uuid [lindex $argv 0];
+set region [lindex $argv 1];
+
+spawn ./console.sh "$uuid" "$region"
+
+set timeout 1200
+
+send "\n"
+
+expect {
+       "Welcome to NixOS" {
+              puts ">>>> BOOTED"
+       }
+       "test-instance login:" {
+              puts ">>>> BOOTED"
+       }
+}

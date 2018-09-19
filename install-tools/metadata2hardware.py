@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import requests
+import subprocess
 from glob import glob
 import re
 
@@ -24,7 +25,10 @@ def mkRootPassword(path):
 def mkBonds(blob):
     cfg = """
       networking.bonds.bond0 = {{
-        driverOptions.mode = "{mode}";
+        driverOptions = {{
+{bonding_options}
+        }};
+
         interfaces = [
           {interfaces}
         ];
@@ -32,16 +36,47 @@ def mkBonds(blob):
     """
     interfacePart = '"{}"'
 
-    modes = {4: "802.3ad", 5: "balance-tlb"}
-    mode = modes[blob['network']['bonding']['mode']]
-    macToName = {open(f).read().strip(): f.split('/')[4] for f in glob('/sys/class/net/*/address')}
+    mode_to_options = {4: """
+          mode = "802.3ad";
+          xmit_hash_policy = "layer3+4";
+          lacp_rate = "fast";
+          downdelay = "200";
+          miimon = "100";
+          updelay = "200";
+""",
+                       5: """
+          mode = "balance-tlb";
+          xmit_hash_policy = "layer3+4";
+          downdelay = "200";
+          updelay = "200";
+          miimon = "100";
+"""
+                       }
+    mode_options = mode_to_options[blob['network']['bonding']['mode']]
+    macToName = collectMacToName()
 
     interfaces = [
         interfacePart.format(macToName[interface['mac']])
         for interface in blob['network']['interfaces']
+        if interface['bond'] == 'bond0'
     ]
 
-    return cfg.format(mode=mode, interfaces=" ".join(interfaces))
+    return cfg.format(bonding_options=mode_options.strip("\n"),
+                      interfaces=" ".join(interfaces))
+
+
+def collectMacToName():
+    interfaces = [filename.split('/')[4]
+                  for filename in glob('/sys/class/net/*/address')
+                  if filename.split('/')[4] != 'bond0']
+    mac_to_name = {nic_permaddr(interface): interface
+                   for interface in interfaces}
+    return mac_to_name
+
+
+def nic_permaddr(interface):
+    output = subprocess.check_output(['ethtool', '--show-permaddr', interface])
+    return output.decode("utf-8").strip().split()[-1]
 
 
 def mkNetworking(blob, path):
@@ -86,7 +121,8 @@ def mkNetworking(blob, path):
             '147.75.207.208',
         ]
 
-    vals['nameservers'] = '\n'.join(['        "%s"' % ns for ns in nameservers])
+    vals['nameservers'] = '\n'.join(['        "%s"' % ns
+                                     for ns in nameservers])
     for exp in ('hostname', 'gateway', 'gateway6', 'nameservers'):
         assert exp in vals, 'missing configuration data: %s' % exp
 
@@ -96,7 +132,7 @@ def mkNetworking(blob, path):
 def mkInterfaces(blob):
     cfg = """
       networking.interfaces.bond0 = {{
-        useDHCP = true;
+        useDHCP = false;
 
         ipv4 = {{
           routes = [
@@ -130,13 +166,15 @@ def mkInterfaces(blob):
         if address['enabled']:
             if not address['public']:
                 privateipv4gateway = address['gateway']
-            part = ipPart.format(address=address['address'], prefix=address['cidr'])
+            part = ipPart.format(address=address['address'],
+                                 prefix=address['cidr'])
             if address['address_family'] == 4:
                 ip4s.append(part)
             elif address['address_family'] == 6:
                 ip6s.append(part)
 
-    return cfg.format(ip4s="\n".join(ip4s), ip6s="\n".join(ip6s), privateipv4gateway=privateipv4gateway)
+    return cfg.format(ip4s="\n".join(ip4s), ip6s="\n".join(ip6s),
+                      privateipv4gateway=privateipv4gateway)
 
 
 def mkRootKeys(blob):

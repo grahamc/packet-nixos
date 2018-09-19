@@ -1,14 +1,16 @@
 let
-  pkgs = import <nixpkgs> {};
-  mkNixos = import <nixpkgs/nixos>;
+  pkgs = import ./nix {};
+  mkNixos = import "${pkgs.path}/nixos";
 
   mkPXEInstaller = { name, system, img
-    , installTimeConfigFiles ? [ ./base.nix ]  # Used only during install time
+    , installTimeConfigFiles ? [ ]  # Used only during install time
     , runTimeConfigFiles # Used only after installation
     , configFiles  # Used during and after install time
     , partition # Partition commands
     , format # formatting commands
     , mount # mount commands
+    , kexec ? false # skip the reboot, just kexec in
+    , enable ? true
     }: let
 
     handjam = {
@@ -28,12 +30,13 @@ let
       inherit system;
       configuration = {
         imports = [
-          <nixpkgs/nixos/modules/installer/netboot/netboot-minimal.nix>
+          ./base.nix
+          "${pkgs.path}/nixos/modules/installer/netboot/netboot-minimal.nix"
           handjam
         ] ++ installTimeConfigFiles ++ configFiles ++ [
           {
             installer = {
-              inherit partition format mount;
+              inherit partition format mount kexec;
               type = "${name}-${system}";
               configFiles = configFiles ++ runTimeConfigFiles;
               runTimeNixOS = "${runTimeNixOS.system}";
@@ -44,14 +47,15 @@ let
     };
 
     build = installTimeNixos.config.system.build;
-  in pkgs.runCommand name {
+  in if enable then installTimeNixos.pkgs.runCommand name {
     passthru.system = system;
+    passthru.class = name;
   } ''
     mkdir $out
     ln -s ${build.netbootRamdisk}/initrd $out/initrd
     ln -s ${build.kernel}/${img} $out/${img}
     ln -s ${build.netbootIpxeScript}/netboot.ipxe $out/netboot.ipxe
-  '';
+  '' else { system = ""; };
 
   partitionOneLinux = disk: ''
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${disk}
@@ -159,6 +163,7 @@ in rec {
     name = "t1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -186,6 +191,7 @@ in rec {
     name = "c1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -218,12 +224,13 @@ in rec {
   };
 
   c1-large-arm = mkPXEInstaller {
+    enable = true;
     name = "c1.large.arm";
     system = "aarch64-linux";
     img = "Image";
+    kexec = false; #??? Fails to reboot!
 
     installTimeConfigFiles = [
-      ./base.nix
       ./instances/c1.large.arm/installer.nix
     ];
 
@@ -239,14 +246,14 @@ in rec {
     partition = partitionLinuxWithBoot "/dev/sda";
 
     format = ''
-      mkfs.vfat /dev/sda1
+      mkfs.vfat -n boot /dev/sda1
       mkfs.ext4 -L nixos /dev/sda2
     '';
 
     mount = ''
       mount /dev/disk/by-label/nixos /mnt
       mkdir -p /mnt/boot/efi
-      mount /dev/sda1 /mnt/boot/efi
+      mount /dev/disk/by-label/boot /mnt/boot/efi
     '';
   };
 
@@ -254,6 +261,7 @@ in rec {
     name = "m1.xlarge.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -283,6 +291,7 @@ in rec {
     name = "c1.xlarge.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -318,6 +327,7 @@ in rec {
     name = "s1.large.x86";
     system ="x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -329,12 +339,12 @@ in rec {
     ];
 
     partition = ''
-      ${partitionLinuxWithBootSwap "/dev/sda"}
+      ${partitionLinuxWithBootSwap "/dev/disk/by-path/pci-0000:00:1f.2-ata-5"}
     '';
 
     format = ''
-      mkswap -L swap /dev/sda2
-      mkfs.ext4 -L nixos /dev/sda3
+      mkswap -L swap "/dev/disk/by-path/pci-0000:00:1f.2-ata-5-part2"
+      mkfs.ext4 -L nixos "/dev/disk/by-path/pci-0000:00:1f.2-ata-5-part3"
     '';
 
     mount = ''
@@ -349,7 +359,6 @@ in rec {
     img = "bzImage";
 
     installTimeConfigFiles = [
-      ./base.nix
       ./instances/c2.medium.x86/installer.nix
     ];
 
@@ -382,6 +391,7 @@ in rec {
     name = "x1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix
@@ -409,6 +419,7 @@ in rec {
     name = "m2.xlarge.x86";
     system = "x86_64-linux";
     img = "bzImage";
+    kexec = true;
 
     configFiles = [
       ./instances/standard.nix

@@ -1,0 +1,144 @@
+set uuid [lindex $argv 0];
+set region [lindex $argv 1];
+set ipv4_public [lindex $argv 2];
+
+spawn ./console.sh "$uuid" "$region"
+set console $spawn_id
+
+
+############################# journal.expect
+set timeout 1200
+
+send -i $console "\n"
+
+expect {
+       -i $console "root@install-environment" {
+              puts ">>>> BOOTED"
+       }
+}
+
+############################### run-welcome.expect
+set timeout 1200
+
+expect {
+       -i $console "Welcome to NixOS" {
+              puts ">>>> BOOTED"
+       }
+       -i $console "test-instance login:" {
+              puts ">>>> BOOTED"
+       }
+}
+
+################################ Network checks
+
+spawn ./check-network.sh "$ipv4_public"
+expect -i "$spawn_id" allok
+wait -i "$spawn_id"
+
+spawn ./rebuild-reboot.sh "$ipv4_public"
+expect -i "$spawn_id" allok
+wait -i "$spawn_id"
+
+
+
+################################ run.expect
+
+set timeout 1200
+
+expect -i $console "GRUB"
+
+# send -i $console "\n"
+
+set UP \x1B\[A;
+set DOWN \x1B\[B;
+
+set timeout 1
+
+set attempts 0
+set dirattempts 0
+set dir "$DOWN"
+while true {
+    expect {
+        -i $console -exact "for boot menu" {
+            # Unstuck on aarch64
+            send -i $console -- "\r\n"
+        }
+
+        -i $console -exact "reboot: Restarting system" {
+            # Dump some buffer
+        }
+        -i $console -exact "*NixOS - Default" {
+            # Fallback from the above, go down an entry
+            send -i $console -- "$dir";
+        }
+        -i $console -exact "*NixOS - All configurations" {
+            # Enter the All configs menu when it is selected (*)
+            send -i $console "\r\n"
+            puts ">>> WOULD ENTER ALL CONFIGURATIONS"
+        }
+        -i $console -exact "NixOS - All configurations" {
+            # Fallback from the above, go down an entry
+            send -i $console -- "$dir";
+        }
+        -i $console -exact "Configuration 2" {
+            send -i $console "\r\n"
+            puts ">>>> CONFIGURATION 2 LOOKS GOOD"
+            break
+        }
+
+        -i $console "NixOS Stage" {
+            puts "!!!!!!!! MISSED GRUB !!!!!!!"
+            exit 1
+        }
+
+        timeout {
+            # Zip up to the top/bottom/top to try again ...
+            send -i $console -- "$dir"
+            incr dirattempts
+
+            if { $dirattempts > 5 } {
+                set dirattempts 0
+                if { "$dir" == "$DOWN" } {
+                    set dir "$UP"
+                } else {
+                    set dir "$DOWN"
+                }
+            }
+
+            if { $attempts > 1000 } {
+                puts "failed to find the Configuration 2 in the bootloader"
+                exit 1
+            }
+            incr attempts
+        }
+    }
+}
+
+set timeout 1
+set attempts 0
+while true {
+    expect {
+        -i $console "test-instance login:" {
+            break
+            puts ">>>> BOOTED"
+        }
+        timeout {
+            send -i $console "\r\n"
+
+            if { $attempts > 1000 } {
+                puts "failed to find the login prompt"
+                exit 1
+            }
+            incr attempts
+
+        }
+    }
+}
+
+######################### Network checks
+
+set timeout 1200
+
+spawn ./check-network.sh "$ipv4_public"
+expect -i "$spawn_id" allok
+wait -i "$spawn_id"

@@ -1,4 +1,32 @@
 # NixOS <3 Packet.net
+## The Official NixOS install images for Packet.net
+
+### User data
+
+Add Nix user-data to your server, and it will be used as part of the
+installation.
+
+Your userdata must look like this:
+
+```
+#!nix
+{ your nix config }
+```
+
+For example, the following user data will install hello automatically:
+
+```
+#!nix
+{ pkgs, ... }:
+{
+  environment.systemPackages = [ pkgs.hello ];
+}
+```
+
+If your user data is not valid Nix or causes the NixOS installation to
+fail, it will be removed and the installation will continue without
+it.
+
 ## Boot Packet.net bare metal with iPXE
 
 Creates an iPXE-based NixOS installer. Has no hard-coded credentials,
@@ -31,6 +59,13 @@ $ ./all.sh
 ```
 
 It will output them all to `./nixos-ipxe-<type>/`
+
+If you pass `dumpkeys` in the commandline arguments, it will dump the
+user-defined SSH keys to the root's account inside the netboot
+environment, for installer debugging.
+
+
+
 
 ## Customization
 

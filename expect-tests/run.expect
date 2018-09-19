@@ -1,0 +1,72 @@
+set uuid [lindex $argv 0];
+set region [lindex $argv 1];
+
+spawn ./console.sh "$uuid" "$region"
+
+set timeout 1200
+
+send "\n"
+
+set UP \x1B\[A;
+set DOWN \x1B\[B;
+
+expect {
+       "NixOS - All configurations" {
+              puts ">>>> GRUB LOOKS GOOD"
+       }
+}
+
+set timeout 1
+set attempts 0
+while true {
+      expect {
+              "NixOS" {
+                      puts "cool"
+                      break
+              }
+              timeout {
+                      if attempts > 600 {
+                          puts "failed to find the NixOS bootloader"
+                          exit 1
+                      }
+                      send -- \x1B\[A;
+                      send -- \x1B\[B;
+                      incr attempts
+              }
+      }
+}
+
+send "\r\n"
+
+set attempts 0
+while true {
+      expect {
+              "Configuration 2" {
+                      puts ">>>> CONFIGURATION 2 LOOKS GOOD"
+                      break
+              }
+              timeout {
+                      if attempts > 600 {
+                          puts "failed to find the Configuration 2 in the bootloader"
+                          exit 1
+                      }
+                      send -- \x1B\[A;
+                      send -- \x1B\[B;
+                      incr attempts
+              }
+      }
+}
+
+send -- \x1B\[B;
+send "\r\n"
+
+set timeout 1200
+
+expect {
+       "Welcome to NixOS" {
+              puts ">>>> BOOTED"
+       }
+       "test-instance login:" {
+              puts ">>>> BOOTED"
+       }
+}

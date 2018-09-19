@@ -5,6 +5,13 @@
       systemd-boot.enable = lib.mkForce false;
       grub = {
         enable = true;
+        font = null;
+        splashImage = null;
+        extraConfig = ''
+          serial
+          terminal_input serial console
+          terminal_output serial console
+        '';
       };
       efi = {
         efiSysMountPoint = "/boot/efi";
@@ -15,11 +22,11 @@
 
   fileSystems = {
     "/" = {
-      device = "/dev/sda2";
+      label = "nixos";
       fsType = "ext4";
     };
     "/boot/efi" = {
-      device = "/dev/sda1";
+      label = "boot";
       fsType = "vfat";
     };
   };
