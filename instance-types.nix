@@ -7,7 +7,7 @@ in pkgs.writeText "pipeline.yml"
       (x: {
         command = ''
           cd ./expect-tests
-          echo ". /run/keys/packet-nixos-config" > ./config.sh
+          echo ". /etc/packet-nixos-config" > ./config.sh
           ./create.sh ${x.class}
         '';
         label = "${x.class}";
