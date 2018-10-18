@@ -10,7 +10,7 @@ in pkgs.writeText "pipeline.yml"
           echo ". /run/keys/packet-nixos-config" > ./config.sh
           ./create.sh ${x.class}
         '';
-        label = "Testing image ${x.class}";
+        label = "${x.class}";
         env = {
           NIX_PATH = "nixpkgs=${pkgs.path}";
         };
