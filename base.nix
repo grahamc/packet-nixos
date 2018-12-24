@@ -75,6 +75,10 @@ in {
       wantedBy = [ "multi-user.target" ];
       after = [ "multi-user.target" ];
       script = ''
+        if ${pkgs.gnugrep}/bin/grep -q dumpkeys /proc/cmdline; then
+          echo "Not running doinstall because dumpkeys was set"
+          exit 1
+        fi
         # ${cfg.runTimeNixOS} # Force realization & config validation
         . ${install-tools}/bin/tools.sh
 

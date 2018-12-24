@@ -10,6 +10,7 @@ let
     , format # formatting commands
     , mount # mount commands
     , kexec ? false # skip the reboot, just kexec in
+    , haltInstall ? false # don't actually install
     , enable ? true
     }: let
 
@@ -42,6 +43,13 @@ let
               runTimeNixOS = "${runTimeNixOS.system}";
             };
           }
+          (if haltInstall then {
+            boot = {
+              kernelParams = [
+                "dumpkeys"
+              ];
+            };
+          } else {})
         ];
       };
     };
