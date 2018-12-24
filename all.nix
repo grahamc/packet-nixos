@@ -27,7 +27,7 @@ let
     mv "./nixos-netboot-images-$now.tar.bz2" $out/
 '';
 in pkgs.runCommand "indexed-pxe-images" {} ''
-  cp -r ${if false then all else allWithTarball} $out
+  cp -r ${if true then all else allWithTarball} $out
 chmod u+w $out
 
 cd $out
