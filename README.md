@@ -60,12 +60,10 @@ $ ./all.sh
 
 It will output them all to `./nixos-ipxe-<type>/`
 
-If you pass `dumpkeys` in the commandline arguments, it will dump the
-user-defined SSH keys to the root's account inside the netboot
-environment, for installer debugging.
-
-
-
+If you pass `debug-install` in the commandline arguments, it will
+dump the user-defined SSH keys to the root's account inside the
+netboot environment, and stop the automatic, unattended install
+process.
 
 ## Customization
 
