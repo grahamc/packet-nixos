@@ -6,42 +6,43 @@ set -o pipefail
 
 . ./config.sh
 
-#,
-#        "userdata": "#!nix\n{ pkgs, ... }: { environment.systemPackages = [ pkgs.hello ]; "
 
 function make_server() {
     PLAN="$1"
     URL="$2"
     terminate=$(TZ=UTC date --date='+1 hour' --iso-8601=seconds)
 
-    # "ipxe_script_url": "'"$URL"'",
-    # "operating_system": "7516833e-1b77-4611-93e9-d48225ca8b3c",
-    #18.03:
-    #
-    curl -v --data '{
-        "facility": [ "ewr1", "iad1", "atl1", "any" ],
-        "plan": "'"$PLAN"'",
+    json=$(cat <<EOF | jq -r .
+      {
+        "facility": [ "dfw2", "ewr1", "iad1", "atl1", "any" ],
+        "plan": "$PLAN",
         "hostname": "test-instance",
-        "description": "Test instance for $TYPE",
-        "operating_system": "97025afd-97d8-4459-bdb6-d3daa98ea162",
+        "description": "Test instance for $PLAN",
+        "ipxe_script_url": "$URL",
+        "operating_system": "7516833e-1b77-4611-93e9-d48225ca8b3c",
         "billing_cycle": "hourly",
-	"spot_instance": true,
-	"spot_price_max": '5.00',
-        "termination_time": "'"${terminate}"'",
+        "termination_time": "${terminate}",
         "userdata": "",
+	"spot_instance": true,
+	"spot_price_max": 15.00,
         "locked": "false",
         "project_ssh_keys": [
         ],
         "user_ssh_keys": [
         ],
-        "features": [
-        ]
-        }
-    ' --header 'Accept: application/json' \
+        "features": []
+      }
+EOF
+        )
+
+    echo "Creating server with: ${json}"
+
+    curl --data "$json" \
+         --header 'Accept: application/json' \
          --header 'Content-Type: application/json' \
-         --header "X-Auth-Token: $token" \
+         --header "X-Auth-Token: $PACKET_TOKEN" \
          --fail \
-         "https://api.packet.net/projects/$PROJECT/devices" \
+         "https://api.packet.net/projects/$PACKET_PROJECT_ID/devices" \
          | tee /dev/stderr \
          | jq -r .href
 }
@@ -50,7 +51,7 @@ function fetch_info() {
     URL="$1"
     curl  --header 'Accept: application/json' \
          --header 'Content-Type: application/json' \
-         --header "X-Auth-Token: $token" \
+         --header "X-Auth-Token: $PACKET_TOKEN" \
          --fail \
          "https://api.packet.net/$URL" \
          | tee /dev/stderr \
@@ -61,7 +62,7 @@ function delete() {
     URL="$1"
     curl -X DELETE  --header 'Accept: application/json' \
          --header 'Content-Type: application/json' \
-         --header "X-Auth-Token: $token" \
+         --header "X-Auth-Token: $PACKET_TOKEN" \
          "https://api.packet.net/$URL" \
     | tee /dev/stderr
 }
@@ -84,7 +85,10 @@ cleanup() {
 }
 trap cleanup EXIT
 
-while ! [ "$(fetch_info "$url" | wc -l)" -eq 5 ]; do sleep 1; done
+while ! [ "$(fetch_info "$url" | wc -l)" -eq 5 ]; do
+      echo "Waiting for addresses for $name"
+      sleep 1;
+done
 
 fetch_info "$url" | xargs ./run.sh
 
