@@ -8,7 +8,10 @@ REGION=$2
 while true; do
     echo "reconnecting" >&2
 
-    ssh "${UUID}@sos.${REGION}.packet.net"
+    ssh \
+        -o StrictHostKeyChecking=no \
+        -o UserKnownHostsFile=/dev/null \
+        "${UUID}@sos.${REGION}.packet.net"
     printf "\n\n\n\n\n"
 
     echo "disconnected"
