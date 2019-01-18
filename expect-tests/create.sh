@@ -35,7 +35,7 @@ function make_server() {
 EOF
         )
 
-    echo "Creating server with: ${json}"
+    echo "Creating server with: ${json}" >&2
 
     curl --data "$json" \
          --header 'Accept: application/json' \
