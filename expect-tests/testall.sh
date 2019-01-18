@@ -20,6 +20,7 @@ check() {
 }
 
 check c1.large.arm
+check c1.large.arm.xda
 check c1.small.x86
 check c1.xlarge.x86
 check c2.medium.x86
