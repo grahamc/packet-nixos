@@ -21,4 +21,6 @@
   hardware.enableAllFirmware = true;
 
   nix.maxJobs = 56;
+
+  services.xserver.videoDrivers = [ "nvidia" ];
 }
