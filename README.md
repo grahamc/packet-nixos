@@ -89,3 +89,20 @@ x m1.xlarge.x86
 x c1.large.arm
 x c1.xlarge.x86
 x s1.large.x86
+
+---
+
+expect-tests/config.sh:
+
+```
+export YES_I_KNOW_THIS_IS_EXPENSIVE=
+export PACKET_TOKEN=
+export PACKET_PROJECT_ID=
+export IPXE_ROOT=
+export TEST_IPV4_PUBLIC=
+export TEST_IPV6_PUBLIC=
+export TEST_IPV4_PRIVATE=
+export BUILD_HOST_ARM_IP=
+export BUILD_HOST_ARM=root@$BUILD_HOST_ARM_IP
+export BUILD_HOST_ARM_PRIVATE_KEY=
+```
