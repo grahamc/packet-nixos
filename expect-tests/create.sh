@@ -35,7 +35,7 @@ function make_server() {
 EOF
         )
 
-    echo "Creating server with: ${json}"
+    echo "Creating server with: ${json}" >&2
 
     curl --data "$json" \
          --header 'Accept: application/json' \
@@ -71,11 +71,9 @@ function delete() {
 name="$1"
 
 if [ "$name" == "c1.large.arm.xda" ]; then
-   pxe_url="$IPXE_ROOT/c1.large.arm/netboot.ipxe"
-#elif [ "$name" == "c2.medium.x86" ]; then
-#   pxe_url="http://147.75.197.111/c2med/netboot.ipxe"
+   pxe_url="$PXE_ROOT/c1.large.arm/netboot.ipxe"
 else
-   pxe_url="$IPXE_ROOT/$name/netboot.ipxe"
+   pxe_url="$PXE_ROOT/$name/netboot.ipxe"
 fi
 
 url=$(make_server "$name" "$pxe_url")
