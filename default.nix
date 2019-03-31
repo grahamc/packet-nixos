@@ -159,70 +159,6 @@ let
   '';
 
 in rec {
-  t1-small-x86 = mkPXEInstaller {
-    name = "t1.small.x86";
-    system = "x86_64-linux";
-    img = "bzImage";
-    kexec = true;
-
-    configFiles = [
-      ./instances/standard.nix
-      ./instances/t1.small.x86/hardware.nix
-    ];
-
-    runTimeConfigFiles = [
-      ./instances/t1.small.x86/installed.nix
-    ];
-
-    partition = partitionLinuxWithSwap "/dev/sda";
-
-    format = ''
-      mkswap -L swap /dev/sda1
-      mkfs.ext4 -L nixos /dev/sda2
-    '';
-
-    mount = ''
-      swapon /dev/sda1
-      mount /dev/disk/by-label/nixos /mnt
-    '';
-  };
-
-  c1-small-x86 = mkPXEInstaller {
-    name = "c1.small.x86";
-    system = "x86_64-linux";
-    img = "bzImage";
-    kexec = true;
-
-    configFiles = [
-      ./instances/standard.nix
-      ./instances/c1.small.x86/hardware.nix
-    ];
-
-    runTimeConfigFiles = [
-      ./instances/c1.small.x86/installed.nix
-    ];
-
-    partition = ''
-      ${partitionLinuxWithBootSwap "/dev/sda"}
-      sfdisk -d /dev/sda | sfdisk /dev/sdb
-
-      udevadm settle
-
-      yes | mdadm --create --verbose /dev/md0 --level=1 /dev/sda2 /dev/sdb2 -n2
-      yes | mdadm --create --verbose /dev/md1 --level=1 /dev/sda3 /dev/sdb3 -n2
-    '';
-
-    format = ''
-      mkswap -L swap /dev/md0
-      mkfs.ext4 -L nixos /dev/md1
-    '';
-
-    mount = ''
-      swapon -L swap
-      mount -L nixos /mnt
-    '';
-  };
-
   c1-large-arm = mkPXEInstaller {
     enable = true;
     name = "c1.large.arm";
@@ -257,28 +193,34 @@ in rec {
     '';
   };
 
-  m1-xlarge-x86 = mkPXEInstaller {
-    name = "m1.xlarge.x86";
+  c1-small-x86 = mkPXEInstaller {
+    name = "c1.small.x86";
     system = "x86_64-linux";
     img = "bzImage";
     kexec = true;
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/m1.xlarge.x86/hardware.nix
+      ./instances/c1.small.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/m1.xlarge.x86/installed.nix
+      ./instances/c1.small.x86/installed.nix
     ];
 
     partition = ''
       ${partitionLinuxWithBootSwap "/dev/sda"}
+      sfdisk -d /dev/sda | sfdisk /dev/sdb
+
+      udevadm settle
+
+      yes | mdadm --create --verbose /dev/md0 --level=1 /dev/sda2 /dev/sdb2 -n2
+      yes | mdadm --create --verbose /dev/md1 --level=1 /dev/sda3 /dev/sdb3 -n2
     '';
 
     format = ''
-      mkswap -L swap /dev/sda2
-      mkfs.ext4 -L nixos /dev/sda3
+      mkswap -L swap /dev/md0
+      mkfs.ext4 -L nixos /dev/md1
     '';
 
     mount = ''
@@ -323,36 +265,6 @@ in rec {
     '';
   };
 
-  s1-large-x86 = mkPXEInstaller {
-    name = "s1.large.x86";
-    system ="x86_64-linux";
-    img = "bzImage";
-    kexec = true;
-
-    configFiles = [
-      ./instances/standard.nix
-      ./instances/s1.large.x86/hardware.nix
-    ];
-
-    runTimeConfigFiles = [
-      ./instances/s1.large.x86/installed.nix
-    ];
-
-    partition = ''
-      ${partitionLinuxWithBootSwap "/dev/disk/by-path/pci-0000:00:1f.2-ata-5"}
-    '';
-
-    format = ''
-      mkswap -L swap "/dev/disk/by-path/pci-0000:00:1f.2-ata-5-part2"
-      mkfs.ext4 -L nixos "/dev/disk/by-path/pci-0000:00:1f.2-ata-5-part3"
-    '';
-
-    mount = ''
-      swapon -L swap
-      mount -L nixos /mnt
-    '';
-  };
-
   c2-medium-x86 = mkPXEInstaller {
     name = "c2.medium.x86";
     system = "x86_64-linux";
@@ -387,22 +299,52 @@ in rec {
     '';
   };
 
-  x1-small-x86 = mkPXEInstaller {
-    name = "x1.small.x86";
+  g2-large-x86 = mkPXEInstaller {
+    name = "g2.large.x86";
     system = "x86_64-linux";
     img = "bzImage";
     kexec = true;
 
     configFiles = [
       ./instances/standard.nix
-      ./instances/x1.small.x86/hardware.nix
+      ./instances/g2.large.x86/hardware.nix
     ];
 
     runTimeConfigFiles = [
-      ./instances/x1.small.x86/installed.nix
+      ./instances/g2.large.x86/installed.nix
     ];
 
     partition = partitionLinuxWithBootSwap "/dev/sda";
+
+    format = ''
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
+    '';
+
+    mount = ''
+      swapon -L swap
+      mount -L nixos /mnt
+    '';
+  };
+
+  m1-xlarge-x86 = mkPXEInstaller {
+    name = "m1.xlarge.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+    kexec = true;
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/m1.xlarge.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/m1.xlarge.x86/installed.nix
+    ];
+
+    partition = ''
+      ${partitionLinuxWithBootSwap "/dev/sda"}
+    '';
 
     format = ''
       mkswap -L swap /dev/sda2
@@ -428,6 +370,94 @@ in rec {
 
     runTimeConfigFiles = [
       ./instances/m2.xlarge.x86/installed.nix
+    ];
+
+    partition = partitionLinuxWithBootSwap "/dev/sda";
+
+    format = ''
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
+    '';
+
+    mount = ''
+      swapon -L swap
+      mount -L nixos /mnt
+    '';
+  };
+
+  # TODO !!! n2.xlarge.x86
+
+  s1-large-x86 = mkPXEInstaller {
+    name = "s1.large.x86";
+    system ="x86_64-linux";
+    img = "bzImage";
+    kexec = true;
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/s1.large.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/s1.large.x86/installed.nix
+    ];
+
+    partition = ''
+      ${partitionLinuxWithBootSwap "/dev/disk/by-path/pci-0000:00:1f.2-ata-5"}
+    '';
+
+    format = ''
+      mkswap -L swap "/dev/disk/by-path/pci-0000:00:1f.2-ata-5-part2"
+      mkfs.ext4 -L nixos "/dev/disk/by-path/pci-0000:00:1f.2-ata-5-part3"
+    '';
+
+    mount = ''
+      swapon -L swap
+      mount -L nixos /mnt
+    '';
+  };
+
+  t1-small-x86 = mkPXEInstaller {
+    name = "t1.small.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+    kexec = true;
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/t1.small.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/t1.small.x86/installed.nix
+    ];
+
+    partition = partitionLinuxWithSwap "/dev/sda";
+
+    format = ''
+      mkswap -L swap /dev/sda1
+      mkfs.ext4 -L nixos /dev/sda2
+    '';
+
+    mount = ''
+      swapon /dev/sda1
+      mount /dev/disk/by-label/nixos /mnt
+    '';
+  };
+
+  x1-small-x86 = mkPXEInstaller {
+    name = "x1.small.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+    kexec = true;
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/x1.small.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/x1.small.x86/installed.nix
     ];
 
     partition = partitionLinuxWithBootSwap "/dev/sda";
@@ -470,33 +500,4 @@ in rec {
       mount -L nixos /mnt
     '';
   };
-
-  g2-large-x86 = mkPXEInstaller {
-    name = "g2.large.x86";
-    system = "x86_64-linux";
-    img = "bzImage";
-    kexec = true;
-
-    configFiles = [
-      ./instances/standard.nix
-      ./instances/g2.large.x86/hardware.nix
-    ];
-
-    runTimeConfigFiles = [
-      ./instances/g2.large.x86/installed.nix
-    ];
-
-    partition = partitionLinuxWithBootSwap "/dev/sda";
-
-    format = ''
-      mkswap -L swap /dev/sda2
-      mkfs.ext4 -L nixos /dev/sda3
-    '';
-
-    mount = ''
-      swapon -L swap
-      mount -L nixos /mnt
-    '';
-  };
-
 }
