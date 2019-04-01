@@ -40,13 +40,12 @@ done. Per-instance config types are in ./instances/.
 
 ---
 
-expect-tests/config.sh:
+Add the following to `expect-tests/config.sh`:
 
 ```
 export YES_I_KNOW_THIS_IS_EXPENSIVE=
 export PACKET_TOKEN=
 export PACKET_PROJECT_ID=
-export IPXE_ROOT=
 export TEST_IPV4_PUBLIC=
 export TEST_IPV6_PUBLIC=
 export TEST_IPV4_PRIVATE=
@@ -54,3 +53,11 @@ export BUILD_HOST_ARM_IP=
 export BUILD_HOST_ARM=root@$BUILD_HOST_ARM_IP
 export BUILD_HOST_ARM_PRIVATE_KEY=
 ```
+
+ - `YES_I_KNOW_THIS_IS_EXPENSIVE` is the number of dollars per hour
+   the setup systems will cost
+ - for `TEST_IPV*` IPs, enter IPs of other systems in your Packet
+   project. These will be pinged by the test infrastructure.
+ - `BUILD_HOST_ARM_IP` and `BUILD_HOST_ARM_PRIVATE_KEY` is an aarch64
+   builder ready to go, and the private key is already setup on the
+   target for remote Nix builds.
