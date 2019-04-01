@@ -10,7 +10,7 @@ set -o pipefail
 function make_server() {
     PLAN="$1"
     URL="$2"
-    terminate=$(TZ=UTC date --date='+1 hour' --iso-8601=seconds)
+    terminate=$(TZ=UTC date --date='+3 hour' --iso-8601=seconds)
 
     json=$(cat <<EOF | jq -r .
       {
