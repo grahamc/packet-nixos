@@ -10,21 +10,19 @@ set -o pipefail
 function make_server() {
     PLAN="$1"
     URL="$2"
-    terminate=$(TZ=UTC date --date='+3 hour' --iso-8601=seconds)
+
+    reservation_id=""
+    facility=""
 
     json=$(cat <<EOF | jq -r .
       {
-        "facility": [ "dfw2", "ewr1", "iad1", "atl1", "any" ],
         "plan": "$PLAN",
         "hostname": "test-instance",
         "description": "Test instance for $PLAN",
         "ipxe_script_url": "$URL",
         "operating_system": "7516833e-1b77-4611-93e9-d48225ca8b3c",
         "billing_cycle": "hourly",
-        "termination_time": "${terminate}",
         "userdata": "",
-	"spot_instance": true,
-	"spot_price_max": 15.00,
         "locked": "false",
         "project_ssh_keys": [
         ],
@@ -34,6 +32,39 @@ function make_server() {
       }
 EOF
         )
+
+
+    if [ "x$reservation_id" == "x" ]; then
+        terminate=$(TZ=UTC date --date='+3 hour' --iso-8601=seconds)
+        json=$(jq -s '$json * $extra' --argjson json "$json" --argjson extra '
+        {
+            "termination_time": "'"$terminate"'",
+            "spot_instance": true,
+            "spot_price_max": 15.00
+        }
+        ' < /dev/null)
+    else
+        json=$(jq -s '$json * $extra' --argjson json "$json" --argjson extra '
+        {
+            "hardware_reservation_id": "'"$reservation_id"'"
+        }
+        ' < /dev/null)
+    fi
+
+    if [ "x$facility" == "x" ]; then
+        json=$(jq -s '$json * $extra' --argjson json "$json" --argjson extra '
+        {
+            "facility": [ "dfw2", "ewr1", "sjc1", "iad1", "atl1", "any" ]
+        }
+        ' < /dev/null)
+    else
+
+        json=$(jq -s '$json * $extra' --argjson json "$json" --argjson extra '
+        {
+            "facility": "'"$facility"'"
+        }
+        ' < /dev/null)
+    fi
 
     echo "Creating server with: ${json}" >&2
 
