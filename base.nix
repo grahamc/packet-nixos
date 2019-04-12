@@ -61,7 +61,7 @@ in {
       wantedBy = [ "multi-user.target" ];
       after = [ "multi-user.target" ];
       script = ''
-        if ${pkgs.gnugrep}/bin/grep -q dumpkeys /proc/cmdline; then
+        if ${pkgs.gnugrep}/bin/grep -q debug-install /proc/cmdline; then
           mkdir /root/.ssh || true
           touch /root/.ssh/authorized_keys
           chmod 0644 /root/.ssh/authorized_keys
@@ -75,6 +75,10 @@ in {
       wantedBy = [ "multi-user.target" ];
       after = [ "multi-user.target" ];
       script = ''
+        if ${pkgs.gnugrep}/bin/grep -q debug-install /proc/cmdline; then
+          echo "Not running doinstall because debug-install was set"
+          exit 1
+        fi
         # ${cfg.runTimeNixOS} # Force realization & config validation
         . ${install-tools}/bin/tools.sh
 

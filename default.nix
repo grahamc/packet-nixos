@@ -10,6 +10,7 @@ let
     , format # formatting commands
     , mount # mount commands
     , kexec ? false # skip the reboot, just kexec in
+    , debugInstall ? false # don't actually install, but dump keys
     , enable ? true
     }: let
 
@@ -42,6 +43,13 @@ let
               runTimeNixOS = "${runTimeNixOS.system}";
             };
           }
+          (if debugInstall then {
+            boot = {
+              kernelParams = [
+                "dumpkeys"
+              ];
+            };
+          } else {})
         ];
       };
     };
