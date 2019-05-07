@@ -52,8 +52,13 @@ if [ "${YES_I_KNOW_THIS_IS_EXPENSIVE:-x}" != "$hourly" ]; then
     exit 1
 fi
 
-ip_addr=$(test_device);
-if [ $? -ne 0 ]; then
+
+set +e
+ip_addr=$(test_device)
+ret=$?
+set -e
+
+if [ $ret -ne 0 ]; then
     echo "Provisioning a new test device..."
     packet-cli baremetal create-device \
                --os-type nixos_18_03 \
@@ -63,8 +68,12 @@ if [ $? -ne 0 ]; then
                --spot-instance \
                --spot-price-max "$hourly"
 
-    ip_addr=$(test_device);
-    if [ $? -ne 0 ]; then
+    set +e
+    ip_addr=$(test_device)
+    ret=$?
+    set -e
+
+    if [ $ret -ne 0 ]; then
         echo "Failed to provision the test device? test_device() failed."
         exit 1
     fi
