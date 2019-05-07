@@ -265,6 +265,40 @@ in rec {
     '';
   };
 
+  c2-large-arm = mkPXEInstaller {
+    enable = true;
+    name = "c2.large.arm";
+    system = "aarch64-linux";
+    img = "Image";
+    kexec = false; #??? Fails to reboot!
+
+    installTimeConfigFiles = [
+      ./instances/c2.large.arm/installer.nix
+    ];
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/c2.large.arm/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/c2.large.arm/installed.nix
+    ];
+
+    partition = partitionLinuxWithBoot "/dev/sda";
+
+    format = ''
+      mkfs.vfat -n boot /dev/sda1
+      mkfs.ext4 -L nixos /dev/sda2
+    '';
+
+    mount = ''
+      mount /dev/disk/by-label/nixos /mnt
+      mkdir -p /mnt/boot/efi
+      mount /dev/disk/by-label/boot /mnt/boot/efi
+    '';
+  };
+
   c2-medium-x86 = mkPXEInstaller {
     name = "c2.medium.x86";
     system = "x86_64-linux";
@@ -385,7 +419,33 @@ in rec {
     '';
   };
 
-  # TODO !!! n2.xlarge.x86
+  n2-xlarge-x86 = mkPXEInstaller {
+    name = "n2.xlarge.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+    kexec = true;
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/n2.xlarge.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/n2.xlarge.x86/installed.nix
+    ];
+
+    partition = partitionLinuxWithBootSwap "/dev/sda";
+
+    format = ''
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
+    '';
+
+    mount = ''
+      swapon -L swap
+      mount -L nixos /mnt
+    '';
+  };
 
   s1-large-x86 = mkPXEInstaller {
     name = "s1.large.x86";

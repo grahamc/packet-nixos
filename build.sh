@@ -9,7 +9,7 @@ buildHost=root@$PXE_BUILD_HOST
 
 set -x
 
-drv=$(realpath $(nix-instantiate ./all.nix --show-trace --add-root ./result.drv --indirect))
+drv=$(realpath $(time nix-instantiate ./all.nix --show-trace --add-root ./result.drv --indirect))
 
 export NIX_SSHOPTS="-o UserKnownHostsFile=./pxe-known-host"
 nix-copy-closure --to "$buildHost" "$drv"

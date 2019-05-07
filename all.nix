@@ -1,3 +1,4 @@
+{ tarball ? false }:
 let
   arm = import ./arm.nix;
   x86 = import ./x8664.nix;
@@ -27,7 +28,7 @@ let
     mv "./nixos-netboot-images-$now.tar.bz2" $out/
 '';
 in pkgs.runCommand "indexed-pxe-images" {} ''
-  cp -r ${if true then all else allWithTarball} $out
+  cp -r ${if tarball then allWithTarball else all} $out
 chmod u+w $out
 
 cd $out

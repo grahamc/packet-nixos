@@ -7,7 +7,7 @@ set console $spawn_id
 
 
 ############################# journal.expect
-set timeout 1200
+set timeout 3600
 
 send -i $console "\n"
 
