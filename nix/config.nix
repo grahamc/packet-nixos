@@ -4,7 +4,7 @@ let
 
   url = "https://github.com/nixos/nixpkgs-channels.git";
 in rec {
-  branch = "nixos-19.03";
+  branch = "nixos-19.09";
 
   pinned = let
       src = builtins.fromJSON (builtins.readFile ./nixpkgs.json);
