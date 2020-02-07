@@ -24,6 +24,7 @@ check c1.large.arm.xda
 check c1.small.x86
 check c1.xlarge.x86
 check c2.medium.x86
+check c3.small.x86
 check g2.large.x86
 check m1.xlarge.x86
 check m2.xlarge.x86

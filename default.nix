@@ -560,4 +560,35 @@ in rec {
       mount -L nixos /mnt
     '';
   };
+
+  c3-small-x86 = mkPXEInstaller {
+    name = "c3.small.x86";
+    system = "x86_64-linux";
+    img = "bzImage";
+    kexec = true;
+
+    configFiles = [
+      ./instances/standard.nix
+      ./instances/c3.small.x86/hardware.nix
+    ];
+
+    runTimeConfigFiles = [
+      ./instances/c3.small.x86/installed.nix
+    ];
+
+    partition = partitionLinuxWithBootSwap "/dev/sda";
+
+    format = ''
+      mkfs.vfat /dev/sda1
+      mkswap -L swap /dev/sda2
+      mkfs.ext4 -L nixos /dev/sda3
+    '';
+
+    mount = ''
+      swapon -L swap
+      mount -L nixos /mnt
+      mkdir -p /mnt/boot/efi
+      mount /dev/sda1 /mnt/boot/efi
+    '';
+  };
 }
