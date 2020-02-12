@@ -14,7 +14,7 @@
       };
       efi = {
         efiSysMountPoint = "/boot/efi";
-        canTouchEfiVariables = lib.mkForce false;
+        canTouchEfiVariables = true;
       };
     };
   };
