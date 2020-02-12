@@ -65,6 +65,14 @@ def mkBonds(blob):
                       interfaces=" ".join(interfaces))
 
 
+def lowest_bond_mac(blob):
+    # https://github.com/NixOS/nixpkgs/issues/69360#issuecomment-558823357
+    # ^ and thread.
+    macs = [interface['mac'] for interface in blob['network']['interfaces']]
+    macs.sort()
+    return macs[0]
+
+
 def collectMacToName():
     interfaces = [filename.split('/')[4]
                   for filename in glob('/sys/class/net/*/address')
@@ -133,6 +141,7 @@ def mkInterfaces(blob):
     cfg = """
       networking.interfaces.bond0 = {{
         useDHCP = false;
+        macAddress = "{bond_mac}";
 
         ipv4 = {{
           routes = [
@@ -174,7 +183,8 @@ def mkInterfaces(blob):
                 ip6s.append(part)
 
     return cfg.format(ip4s="\n".join(ip4s), ip6s="\n".join(ip6s),
-                      privateipv4gateway=privateipv4gateway)
+                      privateipv4gateway=privateipv4gateway,
+                      bond_mac=lowest_bond_mac(blob))
 
 
 def mkRootKeys(blob):
