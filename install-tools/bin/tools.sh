@@ -89,7 +89,8 @@ do_install() {
     apply_user_data
     if ! nixos-install < /dev/null; then
         delete_user_data
-    fi
+    fin
+    nixos-install < /dev/null # apply second time to rebuild with new effective nix.* values
 
     notify.py installed
     touch /mnt/etc/.packet-phone-home
